@@ -1,0 +1,5 @@
+# Never upload secrets or local-only folders to Vercel.
+.env
+.env.local
+.venv
+__pycache__

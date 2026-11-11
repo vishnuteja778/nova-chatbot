@@ -1,0 +1,6 @@
+# Secrets: never upload these
+.env
+
+# Virtual environment and Python caches
+.venv/
+__pycache__/

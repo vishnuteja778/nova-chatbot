@@ -1,0 +1,10 @@
+# Secrets: never upload these
+.env
+.env.local
+
+# Local Python stuff
+.venv/
+__pycache__/
+
+# Vercel CLI link info
+.vercel/
