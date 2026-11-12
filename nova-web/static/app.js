@@ -360,7 +360,7 @@ function addBot(text = "") {
   const el = document.createElement("article");
   el.className = "msg bot";
   el.innerHTML = `<span class="avatar">${MARK}</span>
-    <div class="content"><div class="who">Nova</div><div class="body"></div>
+    <div class="content"><div class="who">Nova</div><div class="tools"></div><div class="body"></div>
     <div class="actions"><button type="button" class="copy" aria-label="Copy reply">
       <span class="icons">${ICON_COPY}${ICON_CHECK}</span><span class="label">Copy</span></button></div></div>`;
   const body = el.querySelector(".body");
@@ -375,6 +375,17 @@ function addBot(text = "") {
   return {
     el, body,
     thinking() { body.innerHTML = '<span class="thinking">Thinking…</span>'; },
+    // A status chip for each tool Nova runs ("Getting quote TCS.NS").
+    tool(label) {
+      const tools = el.querySelector(".tools");
+      tools.querySelectorAll(".tool-chip.running").forEach(c => c.classList.remove("running"));
+      const chip = document.createElement("span");
+      chip.className = "tool-chip running";
+      chip.textContent = label;              // textContent: never parsed as HTML
+      tools.appendChild(chip);
+      if (pinned) scrollDown();
+    },
+    toolsDone() { el.querySelectorAll(".tool-chip.running").forEach(c => c.classList.remove("running")); },
     set(text) { raw = text; body.innerHTML = render(text); },
     fail(message) { el.classList.add("error"); body.textContent = message; },
   };
@@ -561,14 +572,29 @@ async function send(text) {
     }
 
     // Read the streamed reply piece by piece, like the for-loop in chatbot.py.
+    // The server marks tool activity as "\x02label\x03" inside the text stream.
+    // Those markers become status chips; everything else is the reply.
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
+    let pending = "";
     while (true) {
       const { value, done } = await reader.read();
       if (done) break;
       if (!bot.el.classList.contains("streaming")) bot.el.classList.add("streaming");
-      stream.push(decoder.decode(value, { stream: true }));
+      pending += decoder.decode(value, { stream: true });
+      let out = "";
+      while (true) {
+        const start = pending.indexOf("\x02");
+        if (start === -1) { out += pending; pending = ""; break; }
+        out += pending.slice(0, start);
+        const end = pending.indexOf("\x03", start);
+        if (end === -1) { pending = pending.slice(start); break; }   // marker split across chunks
+        bot.tool(pending.slice(start + 1, end));
+        pending = pending.slice(end + 1);
+      }
+      if (out) { bot.toolsDone(); stream.push(out); }
     }
+    bot.toolsDone();
     stream.end();
   } catch (err) {
     stream.stop();

@@ -14,6 +14,7 @@ import threading
 import time
 import zipfile
 from collections import deque
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from xml.etree import ElementTree
 
@@ -26,6 +27,8 @@ from pydantic import BaseModel, Field
 from pypdf import PdfReader
 
 load_dotenv()  # local only; on Vercel the variables come from the dashboard
+
+import stock_tools  # noqa: E402  (imported after load_dotenv so it can read TAVILY_API_KEY)
 
 # .strip() removes spaces and line breaks that sneak in when values are copied
 # and pasted into a dashboard. A key with a trailing line break can't be sent
@@ -46,6 +49,32 @@ SYSTEM_PROMPT = (
     "The user may attach files. Their contents appear inside <file name=\"...\"> tags in the "
     "user's message. Use them to answer, and mention the file name when you quote from one."
 )
+
+STOCK_PROMPT = """
+
+## Stock research
+You are also a stock market research assistant. When the user asks about a company or stock:
+1. If you are not sure of the exact ticker, call search_symbol first. Indian stocks use .NS (NSE) or .BO (BSE).
+2. For a general analysis or outlook, call analyze_stock ONCE: it returns quote, price trend, financials and news together. Use the single tools (get_stock_quote, get_price_history, get_financials, get_stock_news, web_search if available) only for narrow follow-up questions. Keep tool calls to a minimum.
+3. Base every number on tool results. Never invent figures. If a tool fails, say what is missing.
+4. Structure the answer with short headings:
+   - Snapshot (price, valuation, market cap)
+   - Trend & technicals (returns, moving averages, RSI, volatility)
+   - Financial health (growth, margins, debt, cash flow)
+   - News & sentiment
+   - Bull case / Bear case (2-3 bullets each)
+   - Outlook: a short-term lean (Bullish / Neutral / Bearish) with a confidence level (Low / Medium) and the 2-3 signals that drive it. Never claim High confidence or certainty.
+   - Key things to watch
+5. End with this exact line: "*This is research, not financial advice. Stock prices are unpredictable; do your own research or consult a registered advisor before investing.*"
+Do not tell the user to buy or sell, and do not give position sizes or personalized portfolio advice. Mention the date of the data you used."""
+
+MAX_TOOL_ROUNDS = 6   # how many times the model may call tools for one question
+RATE_LIMIT_MAX_WAIT = 25  # seconds; Vercel stops a request after 60 s
+
+
+def system_prompt() -> str:
+    # Built per request so the date is always right.
+    return SYSTEM_PROMPT + STOCK_PROMPT + f"\n\nToday's date is {stock_tools.today()}."
 
 # Limits that protect your free Groq quota from a single visitor.
 MAX_MESSAGES = 20          # only the last 20 messages are sent to the model
@@ -172,6 +201,33 @@ def health():
     }
 
 
+def start_stream(messages: list, tools_allowed: bool):
+    """Ask Groq for a streamed reply, turning its errors into HTTP errors."""
+    try:
+        return client.chat.completions.create(
+            model=MODEL, messages=messages, temperature=0.5, stream=True,
+            tools=stock_tools.TOOLS,
+            tool_choice="auto" if tools_allowed else "none",
+        )
+    except groq.AuthenticationError:
+        raise HTTPException(status_code=500, detail="The server's Groq API key is invalid.")
+    except groq.RateLimitError as e:
+        retry = e.response.headers.get("retry-after", "") if e.response is not None else ""
+        try:
+            seconds = max(1, int(float(retry) + 0.999))
+        except ValueError:
+            seconds = 60
+        raise HTTPException(status_code=429, headers={"Retry-After": str(seconds)},
+                            detail=f"Nova is busy (Groq free-tier limit). Try again in {seconds} s.")
+    except groq.APIConnectionError:
+        raise HTTPException(status_code=502, detail="Could not reach Groq.")
+    except groq.BadRequestError as e:
+        # e.g. the model wrote a malformed tool call ("tool_use_failed")
+        raise HTTPException(status_code=502, detail=f"Nova got confused calling a tool. Try rephrasing. ({e.status_code})")
+    except groq.APIStatusError as e:
+        raise HTTPException(status_code=502, detail=f"Groq error {e.status_code}.")
+
+
 @app.post("/api/chat")
 def chat(body: ChatRequest, request: Request):
     check_access(request, chat_limiter)
@@ -180,32 +236,91 @@ def chat(body: ChatRequest, request: Request):
 
     # Same as chatbot.py: system prompt first, then the (trimmed) history.
     history = [m.model_dump() for m in body.messages][-MAX_MESSAGES:]
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}] + history
+    messages = [{"role": "system", "content": system_prompt()}] + history
 
     # Start the stream BEFORE returning, so key/rate-limit errors become
     # proper HTTP errors instead of a half-finished reply.
-    try:
-        stream = client.chat.completions.create(
-            model=MODEL, messages=messages, temperature=0.7, stream=True,
-        )
-    except groq.AuthenticationError:
-        raise HTTPException(status_code=500, detail="The server's Groq API key is invalid.")
-    except groq.RateLimitError:
-        raise HTTPException(status_code=429, detail="Nova is busy (rate limit). Try again in a minute.")
-    except groq.APIConnectionError:
-        raise HTTPException(status_code=502, detail="Could not reach Groq.")
-    except groq.APIStatusError as e:
-        raise HTTPException(status_code=502, detail=f"Groq error {e.status_code}.")
+    stream = start_stream(messages, tools_allowed=True)
 
     def generate():
-        # Each piece is sent to the browser as soon as Groq produces it.
-        try:
-            for chunk in stream:
-                piece = chunk.choices[0].delta.content if chunk.choices else None
-                if piece:
-                    yield piece
-        except groq.APIError:
-            yield "\n\n[Connection to Groq was interrupted. Please try again.]"
+        # The tool loop:
+        #   1. Stream the model's reply. Text goes straight to the browser.
+        #   2. If the model asked for tools instead, run them, add the results
+        #      to `messages`, and ask the model again with that new data.
+        #   3. Repeat until it answers in plain text (or we hit the limit).
+        # Tool activity is sent as "\x02label\x03" markers; the page shows them
+        # as small status chips and leaves them out of the reply text.
+        nonlocal stream
+        for round_no in range(MAX_TOOL_ROUNDS + 1):
+            calls: dict[int, dict] = {}
+            text = ""
+            reasoning = ""
+            try:
+                for chunk in stream:
+                    if not chunk.choices:
+                        continue
+                    delta = chunk.choices[0].delta
+                    # gpt-oss thinks before calling tools. We don't show this, but
+                    # it must be sent back with the tool calls, or the model can
+                    # lose its train of thought and return an empty answer.
+                    reasoning += getattr(delta, "reasoning", None) or ""
+                    if delta.content:
+                        text += delta.content
+                        yield delta.content
+                    # Tool calls can arrive in pieces; glue them together by index.
+                    for tc in delta.tool_calls or []:
+                        slot = calls.setdefault(tc.index, {"id": "", "name": "", "args": ""})
+                        slot["id"] = tc.id or slot["id"]
+                        if tc.function:
+                            slot["name"] += tc.function.name or ""
+                            slot["args"] += tc.function.arguments or ""
+            except groq.APIError:
+                yield "\n\n[Connection to Groq was interrupted. Please try again.]"
+                return
+
+            if not calls:
+                return  # a normal text answer: done
+            if round_no >= MAX_TOOL_ROUNDS:
+                yield "\n\n[Nova needed too many lookups for this question. Try asking something narrower.]"
+                return
+
+            ordered = [calls[i] for i in sorted(calls)]
+            for c in ordered:
+                yield f"\x02{stock_tools.label_for(c['name'], c['args'])}\x03"
+            assistant_msg = {
+                "role": "assistant",
+                "content": text or None,
+                "tool_calls": [{"id": c["id"], "type": "function",
+                                "function": {"name": c["name"], "arguments": c["args"] or "{}"}}
+                               for c in ordered],
+            }
+            if reasoning:
+                assistant_msg["reasoning"] = reasoning
+            messages.append(assistant_msg)
+            # Independent tools run at the same time to save waiting.
+            with ThreadPoolExecutor(max_workers=5) as pool:
+                results = list(pool.map(lambda c: stock_tools.run_tool(c["name"], c["args"]), ordered))
+            for c, result in zip(ordered, results):
+                messages.append({"role": "tool", "tool_call_id": c["id"], "content": result})
+
+            # On the last round the model must answer with what it has.
+            last = round_no >= MAX_TOOL_ROUNDS - 1
+            try:
+                stream = start_stream(messages, tools_allowed=not last)
+            except HTTPException as e:
+                # Groq's free tier allows ~8,000 tokens per minute. If the limit
+                # frees up soon, wait once instead of throwing the research away.
+                wait = int(e.headers.get("Retry-After", "0")) if e.headers else 0
+                if e.status_code != 429 or not 0 < wait <= RATE_LIMIT_MAX_WAIT:
+                    yield f"\n\n[{e.detail}]"
+                    return
+                yield f"\x02Waiting {wait}s for Groq's free-tier limit\x03"
+                time.sleep(wait)
+                try:
+                    stream = start_stream(messages, tools_allowed=not last)
+                except HTTPException as e2:
+                    yield f"\n\n[{e2.detail}]"
+                    return
 
     return StreamingResponse(
         generate(),

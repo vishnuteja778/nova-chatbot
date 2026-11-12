@@ -400,6 +400,27 @@ svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width:
 
 .msg.bot.error .body { color: var(--danger); }
 
+/* Tool activity chips ("Getting quote TCS.NS") above a reply */
+.tools { display: flex; flex-wrap: wrap; gap: 6px; }
+.tools:not(:empty) { margin: 2px 0 10px; }
+.tool-chip {
+  display: inline-flex; align-items: center; gap: 7px; max-width: 100%;
+  padding: 4px 10px 4px 8px; border-radius: 999px;
+  font-size: 12.5px; font-weight: 500; color: var(--muted);
+  background: var(--accent-soft); border: 1px solid var(--line);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  animation: chip-in .35s var(--ease) backwards;
+}
+.tool-chip::before {
+  content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+}
+.tool-chip.running::before { animation: dot 1s ease-in-out infinite; }
+.tool-chip.running { color: var(--ink); }
+@keyframes chip-in { from { opacity: 0; transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) {
+  .tool-chip, .tool-chip.running::before { animation: none; }
+}
+
 .actions { display: flex; gap: 2px; margin: 8px 0 0 -8px; }
 .msg.bot.streaming .actions { visibility: hidden; }
 .copy {
