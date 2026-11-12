@@ -10,7 +10,10 @@ with every message, exactly like messages[] in chatbot.py.
 import io
 import os
 import secrets
+import threading
+import time
 import zipfile
+from collections import deque
 from pathlib import Path
 from xml.etree import ElementTree
 
@@ -68,14 +71,94 @@ class ChatRequest(BaseModel):
     messages: list[Message] = Field(min_length=1)
 
 
-def check_access(request: Request) -> None:
-    """If ACCESS_CODE is set, every request must send the same code."""
-    if not ACCESS_CODE:
-        return
-    sent = request.headers.get("x-access-code", "")
-    # compare_digest avoids leaking the code through timing differences
-    if not secrets.compare_digest(sent, ACCESS_CODE):
-        raise HTTPException(status_code=401, detail="Wrong or missing access code.")
+# ---------- Rate limiting ----------
+# Stops one visitor from burning through your Groq quota.
+#
+# Note: this memory lives inside ONE running copy of the server. Vercel may
+# run several copies at once and restarts them now and then, so these limits
+# are a strong speed bump, not an exact guarantee. For exact limits across
+# all copies you'd store the counts in a shared database such as Redis.
+
+class RateLimiter:
+    """Allows at most `limit` hits per visitor within the last `window` seconds."""
+
+    MAX_VISITORS = 10_000  # forget the oldest visitors so memory can't grow forever
+
+    def __init__(self, limit: int, window: float):
+        self.limit = limit
+        self.window = window
+        self.hits: dict[str, deque] = {}
+        self.lock = threading.Lock()  # sync routes run on several threads
+
+    def _recent(self, key: str, now: float) -> deque:
+        q = self.hits.get(key)
+        if q is None:
+            if len(self.hits) >= self.MAX_VISITORS:
+                self.hits.pop(next(iter(self.hits)))  # drop the oldest visitor
+            q = self.hits[key] = deque()
+        while q and now - q[0] > self.window:
+            q.popleft()
+        return q
+
+    def retry_after(self, key: str) -> int:
+        """0 if the visitor may continue, otherwise seconds until they may."""
+        with self.lock:
+            now = time.monotonic()
+            q = self._recent(key, now)
+            if len(q) < self.limit:
+                return 0
+            return max(1, int(self.window - (now - q[0])) + 1)
+
+    def hit(self, key: str) -> None:
+        with self.lock:
+            now = time.monotonic()
+            self._recent(key, now).append(now)
+
+    def take(self, key: str) -> int:
+        """Count one hit if allowed. Returns 0, or seconds to wait if not."""
+        with self.lock:
+            now = time.monotonic()
+            q = self._recent(key, now)
+            if len(q) >= self.limit:
+                return max(1, int(self.window - (now - q[0])) + 1)
+            q.append(now)
+            return 0
+
+
+chat_limiter = RateLimiter(limit=20, window=60)          # 20 messages per minute
+extract_limiter = RateLimiter(limit=10, window=60)       # 10 file uploads per minute
+bad_code_limiter = RateLimiter(limit=5, window=15 * 60)  # 5 wrong codes per 15 minutes
+
+
+def client_ip(request: Request) -> str:
+    # Vercel puts the visitor's real IP in x-real-ip (it overwrites any value
+    # the visitor tries to send). Locally we fall back to the socket address.
+    return (request.headers.get("x-real-ip", "").strip()
+            or (request.client.host if request.client else "unknown"))
+
+
+def too_many(seconds: int, message: str) -> HTTPException:
+    return HTTPException(status_code=429, detail=message, headers={"Retry-After": str(seconds)})
+
+
+def check_access(request: Request, limiter: RateLimiter) -> None:
+    """Check the access code (if one is set), then the visitor's rate limit."""
+    ip = client_ip(request)
+    if ACCESS_CODE:
+        # Visitors who keep guessing wrong codes are locked out for a while.
+        wait = bad_code_limiter.retry_after(ip)
+        if wait:
+            raise too_many(wait, f"Too many wrong access codes. Try again in {wait // 60 + 1} min.")
+        sent = request.headers.get("x-access-code", "")
+        # compare_digest avoids leaking the code through timing differences
+        if not secrets.compare_digest(sent.encode(), ACCESS_CODE.encode()):
+            if sent:  # an empty code is just "not entered yet", not a guess
+                bad_code_limiter.hit(ip)
+            raise HTTPException(status_code=401, detail="Wrong or missing access code.")
+
+    wait = limiter.take(ip)
+    if wait:
+        raise too_many(wait, f"You're sending messages too fast. Try again in {wait} s.")
 
 
 @app.get("/api/health")
@@ -91,7 +174,7 @@ def health():
 
 @app.post("/api/chat")
 def chat(body: ChatRequest, request: Request):
-    check_access(request)
+    check_access(request, chat_limiter)
     if client is None:
         raise HTTPException(status_code=500, detail="GROQ_API_KEY is not set on the server.")
 
@@ -174,7 +257,7 @@ READERS = {".pdf": read_pdf, ".docx": read_docx}
 @app.post("/api/extract")
 async def extract(request: Request, name: str = Query(min_length=1, max_length=255)):
     """Receive one file's raw bytes and return the text inside it."""
-    check_access(request)
+    check_access(request, extract_limiter)
 
     declared = int(request.headers.get("content-length") or 0)
     if declared > MAX_UPLOAD_BYTES:
