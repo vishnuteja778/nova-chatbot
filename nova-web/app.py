@@ -24,8 +24,12 @@ from pypdf import PdfReader
 
 load_dotenv()  # local only; on Vercel the variables come from the dashboard
 
-MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
-ACCESS_CODE = os.getenv("ACCESS_CODE", "")  # optional password for your site
+# .strip() removes spaces and line breaks that sneak in when values are copied
+# and pasted into a dashboard. A key with a trailing line break can't be sent
+# in an HTTP header, which the Groq library reports as "could not connect".
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
+MODEL = os.getenv("GROQ_MODEL", "").strip() or "openai/gpt-oss-20b"
+ACCESS_CODE = os.getenv("ACCESS_CODE", "").strip()  # optional password for your site
 BOT_NAME = "Nova"
 CREATOR = "Vishnu Teja"
 SYSTEM_PROMPT = (
@@ -50,7 +54,7 @@ MAX_FILE_CHARS = 15_000    # about 4,000 tokens per file, to stay inside free-ti
 MAX_PDF_PAGES = 50
 
 app = FastAPI(title="Nova")
-client = groq.Groq() if os.getenv("GROQ_API_KEY") else None
+client = groq.Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 
 class Message(BaseModel):
