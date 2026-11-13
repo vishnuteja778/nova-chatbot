@@ -7,6 +7,8 @@ Built by Vishnu Teja while learning AI engineering, from a first API call to a d
 
 ## Features
 
+- **Multi-agent team for any task.** A Planner splits substantial requests between an Analyst (live data and exact calculations via tool calling) and a Researcher (RAG over a knowledge library and your documents) working in parallel; a Writer produces the answer, report, plan or code, and a Reviewer checks it. Free-tier Groq models only. See [nova-web/README.md](nova-web/README.md) and the [learning guide](docs/guides/nova-agents-learning-guide.pdf).
+- **RAG over your documents.** Add annual reports or notes to the Library; Nova searches them with hybrid BM25 + vector search and cites the exact passage.
 - **Streaming replies.** Answers appear word by word as the model writes them, with a Stop button.
 - **Conversation memory.** Nova remembers earlier messages in the same chat.
 - **Read your files.** Attach PDFs, Word documents, text, CSV or code files with a button, drag and drop, or paste, then ask questions about them.
@@ -97,6 +99,10 @@ See [nova-web/README.md](nova-web/README.md) for details.
 - Turning PDFs and Word files into text a model can read
 - Keeping secrets out of code and out of git
 - Designing an interface that feels fast and polished
+
+## More projects in this repo
+
+- **[Ask My Docs (rag/)](rag/README.md):** question answering over your own documents with cited answers. Hybrid search (BM25 + embeddings), a cross-encoder reranker and a retrieval evaluation (Hit@4 100%, MRR 1.00 on 18 test questions). Learning guide: [docs/guides/rag-learning-guide.pdf](docs/guides/rag-learning-guide.pdf).
 
 ## Author
 

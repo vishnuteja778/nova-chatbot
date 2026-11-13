@@ -39,6 +39,11 @@
       <div class="topbar-right">
         <span class="status" title="Model in use"><span class="pulse"></span><span id="model">connecting</span></span>
 
+        <button class="icon-btn lib-btn" id="library-btn" type="button" aria-label="Open document library" title="Library" aria-haspopup="dialog" data-magnetic>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h3v15H5zM10 4.5h3v15h-3zM15.2 5.2l2.9-.8 3.6 14.5-2.9.8z"/></svg>
+          <span class="lib-count hidden" id="library-count">0</span>
+        </button>
+
         <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch between light and dark theme" title="Switch theme" data-magnetic>
           <svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true">
             <mask id="moon-mask">
@@ -151,6 +156,43 @@
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- Library: the documents Nova's Researcher agent can search (RAG) -->
+  <div class="lib-scrim hidden" id="library-scrim"></div>
+  <aside class="library hidden" id="library" role="dialog" aria-modal="true" aria-labelledby="library-title">
+    <div class="lib-head">
+      <h2 id="library-title">Library</h2>
+      <button class="icon-btn" id="library-close" type="button" aria-label="Close library">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <p class="lib-intro">Nova's Researcher searches these with RAG and cites the passages it uses, like <code>[D1]</code>.</p>
+
+    <section class="lib-section">
+      <h3>Your documents</h3>
+      <ul class="lib-list" id="library-list"></ul>
+      <p class="lib-empty" id="library-empty">No documents yet. Add annual reports, notes or any PDF, Word or text file. Long attachments are added here automatically.</p>
+      <button class="btn lib-add" id="library-add" type="button" data-ripple>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        <span class="label">Add documents</span>
+      </button>
+      <input type="file" id="library-input" multiple hidden
+        accept=".pdf,.docx,.txt,.md,.markdown,.csv,.json,.html,.htm,.xml">
+      <p class="lib-note">Stored only in this browser. Sent to Nova's server with each message so it can be searched.</p>
+    </section>
+
+    <section class="lib-section">
+      <h3>Built-in knowledge library</h3>
+      <p class="lib-note" id="library-builtin">Ready-made reference documents Nova can search and cite. Add your own above to cover any topic.</p>
+    </section>
+
+    <section class="lib-section">
+      <label class="lib-toggle">
+        <input type="checkbox" id="agents-toggle" checked>
+        <span><strong>Agent team</strong><br>For substantial tasks, a Planner splits the work between an Analyst (live data, calculations), a Researcher (documents), a Writer and a Reviewer who checks the answer. Turn off for faster, simpler replies.</span>
+      </label>
+    </section>
+  </aside>
 
   <script src="/app.js"></script>
 </body>

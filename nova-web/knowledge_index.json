@@ -1,0 +1,367 @@
+{
+"embed_model": "BAAI/bge-small-en-v1.5",
+"chunk_max_chars": 800,
+"chunk_overlap_chars": 150,
+"chunks": [
+{
+"source": "earnings-and-news.md",
+"section": "Quarterly results",
+"text": "Listed companies report results every quarter. In India, companies must publish quarterly results within 45 days of the quarter's end (60 days for the final quarter of the financial year). India's financial year runs from April to March, so Q1 is April to June, and \"FY26\" means April 2025 to March 2026.\n\nKey things to read in a results announcement:",
+"vec": "AP0FAwD+/wQGAQEEAgT6/wDuBf8KAv7+BwH99vnqAvkE+QIA+Qj//QIHC/3+/f3//gIC/QQDAv4EAf39A/voCPv9AgL9CAIB/vwB/QL8APz/BwL7/wIIAgoBBQD7AgL7AvwFLf4H/P/8/f4GAf0ACAv0+f0DBQf+BQEB/PsGBwP5/QYF8v8CAAQGBPr9+wP6+gv//gH7+wsA9wkEA//9/PoD8wYF+v0GAPsA//72BQAK/wECBP4BBQX8+v8EBP368gsC+P8BA/kB+AYJBvsC/QcF//0L+/8A/wH6BP39BuP7Av4GAf8DAAcFBf38AfgEAQL5Afz5AAMBC/b8/wIM+/IBAvr97/8EAwIEAv8EAfcGBP0FDAb4/QMDAQP7/AIC/vr5/AUAAvr2BP0D/Qb5AgAPDPwGBAYGB/kG/QYAAeL9Af4C/v4A+BH9AQX4BAUCAAAECvsVBf7///8E/w36Df/7/vUMAwIAAv8DCAD2+fn99vwAAf/9+/38/Pv+/Qj+"
+},
+{
+"source": "earnings-and-news.md",
+"section": "Quarterly results",
+"text": "year runs from April to March, so Q1 is April to June, and \"FY26\" means April 2025 to March 2026.\n\nKey things to read in a results announcement:\n\n- Revenue and profit growth, both quarter-on-quarter (QoQ) and year-on-year (YoY). YoY is more reliable because many businesses are seasonal.\n- Margins: did operating margin expand or contract, and why?\n- Guidance: what management expects for the coming quarters or year. Changes in guidance often move the stock more than the results themselves.\n- Segment performance: which business lines or geographies grew or shrank.\n- Order book or deal wins for project businesses such as IT services and capital goods.",
+"vec": "//0HAwP+/wcEAQMGAAH7/vzyAv8HAfz+CAP6//fr//4B+QUI/wMAAgQBA/8C+gED/AEC/gAFBAEAB/36BPvoCP0AAQT8CgD9+wAD+AX8//v9A/z9/wMFCAr/A/38/AAABPsCLgAJAvj9/vwFBgIAAgn4+P39CQT8BwMGAfcGDAn9+wMC9QEDAQEEA/38/QX39g78/wH++gwG9AYBAAH8/fn+8wEE9fsGA/UF/f72DAIJ/PwABf0BBAP7+v4EBQH19QkDAf4BAfz/+QAIBfoD/woD/AAG/QMDAQL1/QEBBNr8//4AAgMGAQYDA/z7Af4A+wL+AAL5+QABAvoG+gcCAfsF//397fwCA/wAAAED//QGBQEMCQb3/gIH/QT9/AIG+//4+gIAA/n6Cf4B+vz5BQAJBfz+BQIFA/cC//0AAN3/BQAD/wIC+gsAAQX4AgUGAQAGCf4WBf/9AgAE/g3/Cf8AAPkMBgP///oGDAD+9/7++/0CA/z/AAD+Af/8AAj9"
+},
+{
+"source": "earnings-and-news.md",
+"section": "Expectations: beats and misses",
+"text": "Analysts publish estimates before results; the average is called the consensus. A \"beat\" means results came in above consensus and a \"miss\" means below. Stocks often move on the surprise relative to expectations rather than on whether the results were good in absolute terms. A company can report record profits and still fall if investors expected more.",
+"vec": "Avz/Bgb+CPsJAQUBAvr9Bf71BwX6Afz9CQP6/PbuAPoL+v8B//8EBv34A/wCAAH9+wQC+v/8AgcABgMBCv7xAQQC/gH1DQX7/gYD+AP/AAMBAvoB/wQOBg7/AgD3Bv8B/wT/LwUIBP4E8gEEAgIB/QT5Bf8DAQT6/QME+wACAxEC+gH89v4DAP8FBfwB/fv78RD9A//7+Pz9/P/+AP4C9Pz+9AX//P4DAP4B+vz+AwL9/AH8Cv33AQL/+gMICAD6/Az+AvsHAv37A/0A/wYD/gf89wIAAv79AQj6/AH7Btv9/wcF+vwC/AT/A/71/gr8AvsD+wv2/g0ICgcHAgIHBgAFAwD38fr4+v//AAX/+/kDAvcBBgYB+v79/gj///4B/AP8AAH+Cfn9/wT89AUIBQgICAH/A/8GAP4G/foABd0DA/4AAvz88wUGAAD6/f8F/AT8AAIZAwED/PwEAQH/CwEAAv4IAvwAAQUCCvr89/8A/gP9Af3//QIDAvz+Awn9"
+},
+{
+"source": "earnings-and-news.md",
+"section": "Earnings calls",
+"text": "After results, management usually holds a conference call (concall) with analysts. The question-and-answer section often reveals more than the press release: demand trends, pricing pressure, hiring plans and risks. Changes in tone between calls are worth noting.",
+"vec": "/gH5BAAAAQYC9gIDAv7/CQH+/ggF/P0FCv34/fjt/QMF9wQH+Qb+B/3+Bf4E/AX8/QQD/P4A/f8EA/r+CP3sDfkG/Qf/CgT8/AEH9QcJ+wX++vz8Bv0FCQv8+/z2A/gBBAEDMf4GAfv++/wG/QX/AQP+/QMDAAT5BQQC/wQDBgv7/Af8+f8IAQEACAv7/wD4CBL6Av35/AX8/QX5/wD8+/3/+g/88/f+A/j7AgH5AQH0/gEABP4ABQP7+P0ABPgE+QXzAAP//P74Av8HAQX7AhAA/v4DAv/9DAX5AgQECdn/BAMB+AAC/gMCA/v8Bf8BAP///wD4+goBC/oAAf4AAPgG/v/++v7///oBAQf9/vkD+QMGBAT/+/r//gQD/QYG/QD7Av/8CP3+AwMB7/z7BAYHCP/+BAICAfwABP7+AOQFCP0FA/4C+wgJAf/3BQQI9/0D/wAXAgkBBAUE/w37APj++wEKBQcE/vz8CAL69wD59/sE+/j//P8EBP3//f4F"
+},
+{
+"source": "earnings-and-news.md",
+"section": "Reading news critically",
+"text": "- Separate facts (a contract was signed, a regulator imposed a penalty) from opinions (an analyst thinks the stock will rise).\n- Check the date: old news is usually already reflected in the price.\n- Ask whether the news changes long-term earnings, or only affects sentiment for a few days.\n- Be careful with headlines that report price moves after the fact (\"stock jumps 5%\") - they describe, they don't explain.\n- Prefer primary sources: exchange filings on NSE/BSE, company press releases and annual reports.",
+"vec": "BAL7AgkEA/7+AwcJ/gP/BgD1/AL//QMCDQEAAPrqAPwB/gYF+wUGCf4BAfsFAggABAb8/gIAAgECBAMBAwTtCvv6+gT7CAEA/AEF+wsF//z/Bfv6/gYICQz9Bv7+Av4BAgD9LgIJAQEB/v0I/wL8A/7+/QQA/gD8/QEDAv3/BQsAAgb28/8KBgD9AgT4+P38+Q7+AgL6+AL99wH+Afv59f7+9QYC+fj/CPj/AwD5BwAD/P//Bfr8Cvn6/PwDB/77/Av7AfsG/vsC9fsE/QUBAA/9AgH+/wX2Agf+AAL/B9j+AAMH9gAAAQr++vvzBfz/AAAE+gH5+A0CCfoD/wD7APsG/wP/8P8B/f0E/AQJ/f0GAf8ACgL3/AP6AQQEAPwB/v///gf+Cvz+AQkA+v78BP4FDP4CA/oHAvr6/foD/eAC/wIE+v39+Qj+AwD7+QMGAPwBBgAWBgT7+gX9+w37BQP8CPsOBgIBB/4EBAID9vsA/f4EAPv/+v0J+vr7AQAC"
+},
+{
+"source": "earnings-and-news.md",
+"section": "News sentiment and its limits",
+"text": "Positive or negative news flow can push prices in the short term, but sentiment reverses quickly and much news is already priced in by the time it is widely reported. Many signals mixing positive and negative headlines usually point to a neutral or uncertain outlook rather than a clear direction.",
+"vec": "A/34BQcFCf8EBf8IAgMBCAPz+wMDAgT5C/sCAPrtAf8A/gUC+gD/CPv9AQEB+wEE/f4HAf8ECAD/Bf7+AwTwAfz8+QvyDAUCAQAB/wYDBf4F/v7///4E/wX4Af/7A/z+/P3+KP8GBP0F+PwE+v/9+wn8A/f/AAb7+AEI/vwCAgsE/AL39gYHAf8AAgL1/fr69BL/CP/99gD99/7+BAD6/AMB9QH//f/7AgD/BAX3BwUD/AIEBPoADPwA9/0GA/r7AAn//wEH+P78+/kEAAIF/QP+AQP++wL7AwkBBf37BNn3/AMM/AIBAw0D+Pv2C//9AwMI+QP98wYECvkD/f78Av0IAAf78Ab5AAID/wEHAvoIAP0IDQf7/gH9/QUDAwH7BAT++Qn+E/wCBQH/APz8B/wIEfn/BfAA/v0B//r++eL/Af0HAv8A9wIBCAL+/AMK+wADAAMZAgX59gb++wn9BfsCAv0JBQIABP/+AP4C+Pf/+wIGA/8E+v4M+wH6/AUA"
+},
+{
+"source": "earnings-and-news.md",
+"section": "Analyst ratings and price targets",
+"text": "Brokerage analysts publish ratings (buy, hold, sell) and 12-month price targets. They are useful as a summary of professional opinion, but targets are frequently revised after the price moves, analysts can have conflicts of interest, and the average target has a poor record of predicting exact prices.",
+"vec": "//n8AgD7AgIEAwUF/AP6Cv70/v///v/+Cv78/PXv//sEBPsC/QIFBf8GA/4BAPv+/Qr5+wME//8BBgAICP/uAPv+/QX2AgH/9fwG+gECBgUBAAD9BQQNAggCCP75/wD9BPz5KP8F+/r8+v0A/f72B/32BQT9AwkB/wkGBQAFBwv7CAH79AYG/wQDBgP8+wb9/BT///sA/wj9+P8F/wX9+vcG9QP++vv//gQBBAb9AP/4APz7BAP9BPz/9f4EA/f8/Qz+A/sG+v4C+/kGAAL//w79/gz2/voCCAADBQEFBtj+AgAK+wIGAA4E+fv3/Pj0/Pr7AgL2/hEGC/wDAQr8AP8E/AX9+gH8AgL//AQHAf8L//8BBP/0+wP+CAMGBfgI/AX69/76A/v3Af/5/gD/BwIEBgMC//YGAv4A/AX8AeABBQQD/QL79wQCAAD7/v0H+wgAB/8bCgH/+v7/BAr7BgD+Bv8K/v0H/f4ECAAA+P0D+/0D/QECAAH+Af4D+QUF"
+},
+{
+"source": "earnings-and-news.md",
+"section": "Events that commonly move stocks",
+"text": "- Earnings results and guidance changes.\n- Large contract wins or losses.\n- Management changes, especially CEO or CFO exits.\n- Regulatory actions, penalties or approvals.\n- Mergers, acquisitions, demergers and buybacks.\n- Index inclusion or exclusion (for example joining the Nifty 50), which forces index funds to buy or sell.\n- Promoter buying, selling or pledging of shares.\n- Macro events: RBI interest-rate decisions, the Union Budget, US Federal Reserve decisions, currency moves and commodity prices.",
+"vec": "AfsBAgMACP0B/wQI+/78/vj4+QT///4DCQMAA/nxAP76+wYB+Af+CP3/B/4I/QP7+AL++v//AQAEAgsBCf/rBAP8BQD7Cf4F/gUF+QUD9gYA+f37/gQGAAn9+wYB/AL+Cv8AKAQH+Qb/+v0HBwEABQf8/fwCCAIAAQQHAf8CAgz/+wQA+AMGBQL+/gX9BAL1/hH+/f/99wMD+wAAAgH4+vf/AAwI8P0B/Pf6AfsACgX7+vn+CPL7Bf0C+wIEB/oC9wb//vkA/vf7/PwDAAH7+QUB/gsCAAD6+wf7+gcCCdP6AQMC/v4BAAkF/Pf9Cfz5//0H/gH6+AcGA/wH9wAG/gAH+wL3+//8A/8ABQgD+f0HB/oCCAj9AgEA/gX9BPwI+gT8+AD+BP33BgsBAfwCBgAFB/3/CPoB/v0D+AED/N7/CgEAA/0E9wYD+AL+AAUJ/v4CCf4XCAD+9wIC/xD+Bv3/AwIK//77AP76BQAB+AUCAf3/+f38Af0EC/7++f8D"
+},
+{
+"source": "financial-statements.md",
+"section": "Reading financial statements",
+"text": "Every listed company publishes three core financial statements. Together they show whether the business is growing, profitable, financially strong, and actually generating cash.",
+"vec": "Cfv/AAMHAf8G/wMD/ff+AADxAQAJ+/8DCQMA+/nu+/oE/Qb/Aw0AAv0FBf4BAgf6Av/7+f8A+gH+B/n7BQPnBAMD/f/2BAD2AAEA+AYB9/0DAP4A+AUCAwf/Avr///39A/4FLAMFAvz8AgUD//7+/wX9/AAD/f/+AQEBAPv6BwgEAwYD9f8E+gEABgQCBP/8/xP9/////QII9Pv+Av39/PwC9QkB9foH/v3+///7APj7+gUGBQH7Avv7/Pz//PwC+w7z/gUE/v4DAv8HAQL9Awn+AQsJAv/+AAf9AAj8BN0BAAAF/wAF+gYD//z4/QP1+foEBv/yAQMCC/oICAcAA/gK/vj89f0JA/sEAQAA/AgD/v7/DQH88//4BgQBBggG//n8BPz8BP/5/gEA+//5AvwMDP8BBAAE/PsCAwEEA+P8+AQE//0B/QoHAAD1AAYI/P8CDv4XBfgCBQAFBxL9BAH5A/0IBf39+/n/BwL49PsB+wIH+gcEAfcCAP76/A4G"
+},
+{
+"source": "financial-statements.md",
+"section": "Income statement (profit and loss)",
+"text": "The income statement covers a period (a quarter or a year) and flows from top to bottom:\n\n- Revenue (sales): money earned from selling products or services.\n- Gross profit: revenue minus the direct cost of making what was sold.\n- Operating income (EBIT): gross profit minus operating expenses such as salaries, rent and marketing.\n- Net income (profit after tax): what is left after interest and taxes. This is the \"earnings\" in earnings per share.\n- EPS (earnings per share): net income divided by the number of shares. Diluted EPS also counts shares that could be created from options and convertibles.",
+"vec": "BAAB/QMFBwQLA/8EAvv7A/v6/AYO/PkDCgX6/vvw/P0A+wQB+Qn0Av4ABQAFAfz5AgcC/QIE/P0CA/r7/v7qBf0B/wX6Bf73+f///QoB+fwABgAI/QMHBA37/wD8/QICAQAFLwMFBPf7/gENAwL6Af/4+/78AgL7AQQBAv3/BgoABQQE+gcG/wQBAgT/Bvj6BQ7+/QD8/wcE9f0B/v37+f/59w0B+f4EBPsA///2B/8E/wEFDf/+BAT99P/+AQL+9gX/BAUB/vwJ/wUCA///AQsB+QIBAQP8BQv/Afz5At39AAIE/vj/+wAM/Pn8/vz7+wIAAP///Qb/C/YL/wMH/PoK+fr68vj+AfwJBgAB+wAOA/4JBAf8+vn5AAb5AAIF+AT5/gL/Cvn5AP0A/fr+BfsKCQADB/wEAPj//P76AuIB/gIB/v4F9QcI/gb5Av4J/QUNCf0S/QD4BQEIBQsHC/v8APwGCAL6+/4BBgL/9gAA+wIC+v36+f4J//r9+gUA"
+},
+{
+"source": "financial-statements.md",
+"section": "Margins",
+"text": "Margins show how much of each unit of revenue becomes profit.\n\n- Gross margin = gross profit / revenue. High gross margins (above 50%) are typical of software and strong brands.\n- Operating margin = operating income / revenue. It shows how efficiently the core business runs. Indian IT services companies have historically had operating margins of roughly 20% to 26%.\n- Net profit margin = net income / revenue.\n\nRising margins usually signal pricing power or better efficiency; falling margins can signal competition or rising costs.",
+"vec": "Bv8G+wT9BQIMAAD+Bfr8+wT7/gcQ+/r5CP32/wHs/v8I/wED/wMEA//9AQT8+//+/AIC/P4J/v4CBAACAvztCAP2AAfyCv0C+Pv//gf++foGAPsC+QMKAA39/wH6+PwAAv8HJwECA/3//AMPAgX9C/r8/fv9AQb4+woAAQACBwgE+wP0+wIDAQUGAgH8Bwb//RH7APz/AAj79v8CAwD7+fn59BEH/P8M/gb6Bvj+Bf78Af8AB/76BAb99/z//vr/8wAHAf8CAAILAP3/AwD9+wID/PwABPv8Awv8Bv4A/t4F/f8GBQMDAP0K/v7///sB+/z/AwMC+wgCCvIN9gYC/fv9//r28P7///4EBwP8/gIH/vkEEQH5/vz5/wP3AAAF/wP7+wADBffzAP8F+fYCAwYNAQP9CQMCAf4A//8CBOMB+gQA/f4C/Q0CAQH0BwEJ+AQHB/sQAAEBBP8MAwf+DQEAAf8BCAUA+P0CC/8A+QH//wIEAAME9QL9+fv4/QYA"
+},
+{
+"source": "financial-statements.md",
+"section": "Balance sheet",
+"text": "The balance sheet is a snapshot on one date. Assets = liabilities + shareholders' equity.\n\n- Assets: cash, receivables, inventory, property, investments.\n- Liabilities: debt, payables and other obligations.\n- Shareholders' equity (book value): what would belong to owners if all assets were sold and all liabilities paid.",
+"vec": "AP0B+QYABfgJAwL5AvgA/gD6+wUA+/wDCgD5+PjtAgD+AAQDAAYCBgQBB/sB/gX+BQkG+AIE9gUBCv0DA/3uBgEGBQH6BAH6+v8E+Qb//f//CPwH/QQA/wT+AQECAv0BAP8FLv0JA/38AgL+Avj+/v/2+/z9+/79BgACAPv9CAUHBQYE+wADAAL+AwP6AAD69hUB//0A9wYG9v8D/P38+//78wz88/0DAv8D+vz9DAQA/gIBB/v8AQIA9PkCBf7+/AX3Av0AAAACAwUDAwAAAQL//Av+AQcDBQUC/QDzBN39/fgCAvsB9/4F+f7x/QD9+/z8//f0Aw0GEvgDCQYBAPoK+/b78fwB/gADBgH/+gICAf7/Dwj8/wL+BAb8AQQE+gD3/f3/Bf76/QMA/gD+/voIDQQGA/8E/fn8/wMB/+AA/gYCAf8E+QkHAQL2//4N+QwHB/8UBP8CAgMGCQz+CwD9BfcIBAT8+gEAB//6+f36/QL3/QP9AAAKAgMA/gQF"
+},
+{
+"source": "financial-statements.md",
+"section": "Cash flow statement",
+"text": "Profit is an accounting figure; cash flow shows real money moving.\n\n- Operating cash flow: cash generated by the core business.\n- Capital expenditure (capex): cash spent on long-term assets like factories and equipment.\n- Free cash flow (FCF) = operating cash flow - capex. This is cash available for dividends, buybacks, debt repayment or growth.\n\nA company whose net income keeps rising while operating cash flow stays flat or falls deserves extra scrutiny, because profits are not turning into cash.",
+"vec": "BwIA/QUCC/4CAwD8Avn7/fz7+gEH+vz8CQb+AP3v/AD/+gQDBgf+B/oBCQb//QMA/wgF/QICAf8GA//7//7q/QMCA/37/gP4+foD/wUE+QT8Av0D+QcJ/gj+/QAA/wAB/wMEKAIJBPkE/gINBvf6Agb7/QH6//sFBAf/Bf/9CAkD+wMC9AMB//4D/gb9Bfn4+Az9BQD9+AED9v39+wP7/Pf6+wf+9QEB/Pv8/vn0Cfj7Agf+Cf7//gAC+P7/AvwB+gX9AAMAAAEHCAP9+QAAAQME/AsEBf79/wf5AAL8BNoCBvwJA/3+/AUF/vkB/wD69fz+Av38/AIHD/cM+gQECf0C+f/39wMB/PwHBAT/+f8J/gMDCAn3Bv/2/gj9BgMG+//7/wH+DP74Dv4E/P4CC/4JC/oFCPgB+P0A//4DBd/+/gAC/v8B+gkBBgX8B/8H+QUDBv4VB/78+gMO/Q8BCvr//P4MBAL5/P35A/oC9vr9/QAHAwj//foABP74AQz8"
+},
+{
+"source": "financial-statements.md",
+"section": "Key health ratios",
+"text": "- Return on equity (ROE) = net income / shareholders' equity. It shows how well the company uses owners' money. Above 15% is generally considered good; above 25% is excellent. Very high ROE can also come from heavy debt or buybacks shrinking equity.\n- Debt-to-equity = total debt / shareholders' equity. Below 0.5 is conservative; above 2 is high for most non-financial companies. Banks and NBFCs naturally have high leverage and are judged with different metrics.\n- Current ratio = current assets / current liabilities. Above 1 means short-term assets cover short-term obligations.\n- Interest coverage = operating income / interest expense. Below 2 can signal difficulty servicing debt.",
+"vec": "//r4/wf+CQEF/f7+/AD6/gL7+Q4FAAAHDgH6APXtAf8FAwEF+wT+AvoDBP4G/v74AggFAPsFAwIEBwMFBgPpAf8D/v75BQb+AAT+/gb6A/sDCvsB//0BAgkB/gD9+wEC+/sBLQEI/wAB/QIGCv4F/wP4+/78/AX9AP8C/gAAAggF/gIB9f4BAQAHBQIF/P79/RECAfn+/gAB9P8B/P79+/759AsA9/gCBAQEAf/6BwEA+ggEBfX5BAX+8fz9/P4C+Aj8Bf8IAP8CAP4KAAH//wQF/AcCBQL/CQoABgf+B9r9+PkCAPv+/f0G/gD8AAT8+voBAv33/AkADPIIAQEBAv8O9/798fr//vcB//sDAgACAAL9CgX5+AL9BAX5AAID8wEB9gL+A/sABAQA/gH6Bv4ICQL4Bf4E/vgA+AL//t/7/QQC/gX/9ggDBgn2+/kI+wcEB/4TBvr/+QIEBAv8CPsCA/kDAP8C/P0FC/sA+wb++QcK/P4B+/4E/AAE/AgN"
+},
+{
+"source": "financial-statements.md",
+"section": "Growth",
+"text": "Year-on-year (YoY) growth compares a period with the same period a year earlier, which removes seasonal effects. Consistent revenue and earnings growth over several years matters more than one strong quarter.",
+"vec": "/QEEAAP/AgcH+gUBBQf7/fr6//4K//36CwH2/fvvAAEE+wII/wb9BQEF//v+A/wD+gQD9/wIAAgBDwP8Av/qBAIFBgP+Cvz9/AYF+f/8Av8BAfr9AQD7/gf++wL8/QEABf39Kf4HAPr+AvkBDAT6/wIB+PYBBQL6BAYJ/fkABgsA+QP9+QIC//z9Av3+AgT69w7/BQD6+AUG9v4I+/b/+/sA9QAD+v8IAgEDBAD8CvoFAv0FCvgEBQT8//wFAgX49gECCf8ABP/7/wv/BQQB/gcC+v8DAAAGAwP7AAT1BNr+/QMFAP33+gUAAgD9/gL8+wX5/wEC9QP/Cf0EAAb7AvQE/f358PkBBPsBAgIK9Pj+Av0FAwX8+QME/gH+/AID/AP3+gQACff+Cv78/vr7BvsNDQH9BgMIAPoCAP73A90B/gUBAAEJ/f8FAgn6AwgM/AIGBwAXAP/9AQUFAAQEDAD+BP8HA/77BPgMDQAH+Pr//f7/BgH5+/4D+fv9/Qf9"
+},
+{
+"source": "financial-statements.md",
+"section": "Red flags in financial statements",
+"text": "- Revenue growing but cash flow from operations falling.\n- Receivables growing much faster than revenue (customers may not be paying).\n- Debt rising quickly without matching growth in earnings.\n- Frequent \"one-time\" or \"exceptional\" items that are not really one-time.\n- Large related-party transactions or repeated changes of auditor.\n- Promoter (founder) shareholding being pledged as collateral, which is disclosed by Indian companies.",
+"vec": "/wH5AwIACQMI/ggF/v38//z2+wIG+/z8Dfz79/vs//sEAAQE9Q7/AP0FCQL9/v78/AIB+AAC+v4CBf8AAfvuAQICBQP8BwH79wAE9wAB/AYDBfj+/v8B/ggABf4C//kAAAABMgIGAAT+/gQFBAD5AAP+/Pz7//sIAAgD+Pn7AAsB//8A+AMD/gECBAT7BwD8+g0DBPwA+QsF8/7/Af4D/QL9+g0B9QECBf78/wH6A/r++wEDDv78BgD7+/0F//b88QX+/gICAvsAAwIDAwIFAv0FAQb/AfwEAAr//gT8DdgB/f4C/v4EBAUC/wD5CPn5/AAB+AP9/gMDDfgE/P4DAPkK+/z/9P0C//oGAgb/+QgF/f8FCgj3+AT9AgT+A/0G/QP9/gT7Ffr0CPz7+/wCA/4OCPwAAAED//v+/wAG/937+QAACf0I/QYBBAf9AwAJ9wMBBv8TBv/8AwEE/QoCCgH/AAAIAgL8Af3/A/0D9v4A9v77BAIA+foI/wD//wAB"
+},
+{
+"source": "indian-stock-market.md",
+"section": "Exchanges and indices",
+"text": "India has two main stock exchanges: the National Stock Exchange (NSE) and the BSE (formerly the Bombay Stock Exchange). Most large companies are listed on both. On Yahoo Finance, NSE tickers end in .NS (for example TCS.NS) and BSE tickers end in .BO (for example TCS.BO).\n\nThe two headline indices are the Nifty 50 (the 50 largest and most liquid NSE stocks, Yahoo symbol ^NSEI) and the Sensex (30 large BSE companies, Yahoo symbol ^BSESN). Sector indices such as Nifty IT and Nifty Bank track specific industries.",
+"vec": "Avn7/AP8CP0F+f/5AgEB/v31/wgJAwH8BgEA/vzwB/sDAf3/+AQD+vwEBwcGAAAE/P8D/AIGBP//AgULCgLqCQr7BP36AQf//f4A/gP/+wEC+gP6AQMDBQkABQYC/gX+Agb+JgQA/f0B+Pz/CgABAQb4/fcF+gUEAQQG+fkE/gb8/gQB+f8JAwT+/v77+AT4/QkC+vsA+Aj49/sGBvv7+fj9+gsB7/kG+/74BvwABgED+wQG/vgBCP4D/Pz/APoA+gz9/v4CBv8HAPgGAAIF+QT/CQj+Avr3BQgDCAX8Adz5BPgC+AECBA0EBf72A/7/AAL7/wH+AA0GD/kDAP4EAPsF+P77/QD6/gMBB/0E7gQGAvv/DgX0+f4BA/z8//v9/wIH+PwCBfr1BQUIAgYFBfsKD/0DCvUFBAEB/AEFAeEEAQL//P7/9gUC/QX7Av4O/gQDBvsVCv/78wP+/xQB//v9Cf4EAQECAfQABwL6+gL5/QL//gP9+vr+/vz//AQC"
+},
+{
+"source": "indian-stock-market.md",
+"section": "The regulator: SEBI",
+"text": "The Securities and Exchange Board of India (SEBI) regulates the securities markets. It protects investors, sets disclosure rules for listed companies, and registers market intermediaries. Anyone who gives personalised investment advice for a fee in India must be registered with SEBI as an Investment Adviser (RIA), and research analysts publishing buy/sell recommendations must be registered as Research Analysts (RA). Unregistered \"stock tips\" on social media are a common source of losses and fraud.",
+"vec": "Af/6/f/9DQEDCAH8CwECAf3+AwYFAPz2C/73/PfuCPwCBPkC+f/9/vwABQAFAQP9+QIBAAID/v0BBQYHBQLpCQD/BvwBAgIA+vj/+wYB/AX9/QQBAgIIAwYJAQAGAPz9+AT5LAcD/QX89v0DCP0AAgj9/v4AAP4B/QABAP8D+gIBAAf/8QMIAvr9APn3AgX7AQEGA/f79wX49gAJAwL++v76+QYC8/kF/P37/v4DAfwEBwAHBPn8Bf8C+P7+AO8I+AwEAfwD+gIDA/0FAgP+AAIC/Qz8Af0BCAQG/An+BNn6/QAE+v8H+wcEBff+Af0CAPn++wP+Cw0GDPoEA/v///P/+v399vgAAv7+AQEHAQECA/wEEAT///z8BP8DBPkB/gAHAwL6CPj8AQMI+gEDAgQPCgIKBvsDB/4A9QcC9t8B+wL5+/389wUD+wH6/wIMAAcA/wIUCAf7AAT8BRH4AP8CAfYFBAQE//wEBAH2+QD+A/38//76/fgEAgAAAAED"
+},
+{
+"source": "indian-stock-market.md",
+"section": "Trading hours and settlement",
+"text": "Normal equity trading on NSE and BSE runs from 9:15 am to 3:30 pm IST, Monday to Friday, except exchange holidays. A pre-open session runs from 9:00 to 9:15 am to discover the opening price.\n\nIndia moved to T+1 settlement in 2023: shares and money change hands one working day after the trade.",
+"vec": "AgD9/AABB/gH/f/8AgIDAwLy/QYE/wD+Cv8E/v3qAvgFBgMC+wUD//0HCQAD/v3//AID/QUEAQAJ/wcKBAbnDgP4Bf3/BgQAAPsC/Qb/AP8A/gUA/AUICgQEAf/7Av0B/wL/JwIJ9wP9/Pr/APz7AQn39gIG9gME/wMB9/0CBQX7AgwB9v4PB/n8+/T79QH6AQUE/f738wL5+fv/CQL3+PYD/g0G9P8BAQD8AwL4CQEF/Qb/AvcAA/37/gMF//369wcA/PsABAINAPsHAQMCAAQDBwUC+v0EAgMEAwIDCOL6APcI/fn4CAYKBQD4BAL9AwL//v34/goFDPIA/P8D/fb/+QIH/v79/gP+/v0G9AMEA/n/EAT0/QH/APz8Afz7/gT8+QD///n6AQQDBgQIBPoQDvsJCf4ICvn//QEDAuIFA/0A9/wC8wACAgP/Av0L+/34Av8TC/8D9gIBAA3/BAACBfkK/AD9A/8G//3+9QH6+////gAG/v4FAv4B/P8B"
+},
+{
+"source": "indian-stock-market.md",
+"section": "Price bands and circuit limits",
+"text": "Exchanges set daily price bands (circuit limits) for individual stocks, commonly 2%, 5%, 10% or 20%, to slow down extreme moves. Market-wide circuit breakers pause all trading if the Nifty 50 or Sensex moves 10%, 15% or 20% in a day.",
+"vec": "APkBAPkCB/8E/Aj/AgYCA//4AgkJ+/wAB/cB+v/pBAL+Bvv8/vwGCPYFAwIB/QACAwIF/QcK/wIABQgEAgXyBv/+BgX5BgIDAP4E+f/7/Pz9+Pz5/gYKAvwAAwD0/f8A/gL6KgIB+wf//PsDA/8CBAT6AvwA/wgE9wkI/wIGAAj9AgT6+wQFAgECAQP2+gX0/gn/AP8A9P789/oM///6/v4C+gsC+P0E9/37BwL/CQT9/vf//f39Av4D9voEBvn99gv7/PgE+gAK/PwKAwQF/P/9AQT+Af77/gYEAAcE/tn+/QIFAgH6/wsJAvb1/vf6Av4BAAD6/AwJDvUB/AL5/AQABAAA+AXz+wL7BP4H/wL+BP7/DQb0/P77Afv+AQEDBQX8+gUBDQH4AP/+APwGBAMDC/8JCfkFBAIF+QgF9t8C/wICBQkC8v3+BgMDA/0L/AMJBgEVBQAD+wQD/Af8/vwGA/4F/wH//vcICP358gL9+f79/v3//wMHAAD/+P8E"
+},
+{
+"source": "indian-stock-market.md",
+"section": "Demat accounts and brokers",
+"text": "To buy shares, an investor needs a demat account (which holds shares electronically, through the depositories NSDL or CDSL) and a trading account with a SEBI-registered broker.",
+"vec": "//7++fv9DP4B9QD7AfwB//r7/QX9+v/9DPj+/PTxCPwABP379QL++vf+Bv0D/gD8/wMA/gMC/v8ABQYGDAPwB/z7BwD/BAT/9/8B9Qj9AgT8AwX89wMG/AICBAgB//z+AAb6LggEAQL2/f4CBPoAAwL+BPsC/AEB/QUBAf7/AQb/CQH98fcIBgP3+PvxAAX/BAQI/wH++gT8+gIG/f7++QH8+g4E8fQE/PwAAfwDAwD1/wADAfr+AwAE9gEH+gAK+Ab/APj+AAIGAfsHAgEC/g38AgkAA/0EAgEEAQUABdv8AP8F/wMG/gkM+wH6AAH6B/oB+wIAAhAFFPkFAAEF/PQA+Pv///kBAP0DBQL8BAMEAAD/BP73/AD7BQIF/Pr//AMA/wX8AfYB/wQCAgYC//8MCfwMBgAE/P4A/QYF/+AD/v8A+QQK+AcG/wH6//0N/gcFBf4YBf4B+gL8BhP9Av38A/sEBwX//vcGBAAB9gP9B/7//v37/wMABwP6/QEJ"
+},
+{
+"source": "indian-stock-market.md",
+"section": "Corporate actions",
+"text": "- Dividend: a cash payout to shareholders. To receive it you must hold the shares on the record date.\n- Bonus issue: free extra shares (for example 1:1 doubles your share count); the share price adjusts down, so total value does not change.\n- Stock split: one share is divided into several; again value is unchanged.\n- Buyback: the company repurchases its own shares, often at a premium, reducing share count.\n- Rights issue: existing shareholders may buy new shares, usually at a discount.",
+"vec": "//kB//v9Cf0DBAgE/vgAAvr39wAC9QMDCfj6+fnrAgH7+v4B+gT+A/UGCvz9BQL+AgoC/fz9/wIFBAYFCwD1BQIABAD6CgP+//z/9wMH/f/5CAH/+QIK+wsDCAr9APkCAv/+LQQH/QH6/PkJA/z/BgX8/Pz/AwP6AwAC+/kCBgYEBAX89vwHCP38AQP8/wD59QsFAf8G8wj89QH8AfsA+/r7+xAI9PoEAv/7+wH6BwH58f4BBPoBAQP8+foCBf8C8wr7/vsAAQACAvr+AgMEBQUCAQsB/gf9BQX++wD4DNv+//sBAPwD/AIQAP79Afv7Afv//v38AgsBCP8GAv0JAfYA+fv68wD+AP0ECQH9BQUGAAH1Dw/+AP/9Af/8APoG/gYA+gAABwH8/wAD/AH8BwIECv0FA/wA/PwF/AMCAd8G/f8DAP3+9Ar7AgH9AQANAAUDDP0NAgcHAQH/Bwf/CP/9Bf0LBAj7/f0EB/j++gH//v//AgL4//oCA//8AgcG"
+},
+{
+"source": "indian-stock-market.md",
+"section": "Taxes on listed shares (as announced in the July 2024 Union Budget)",
+"text": "- Short-term capital gains (shares held 12 months or less): taxed at 20%.\n- Long-term capital gains (held more than 12 months): gains above Rs 1.25 lakh per year are taxed at 12.5%.\n- Securities Transaction Tax (STT) applies to every equity trade.\n- Dividends are added to income and taxed at the investor's slab rate.\n\nTax rules change with each budget, so always check the current rules or a tax professional.",
+"vec": "Af7//wIABQEIAggDBAT6Avn0+QMJ+wP9DvP99PfvA/f7AQED+wgGBfsHBgL9Avz8AQz6AQEB/P0BBwMFAAHsAfv+BgMBAQAJAv0G+gEI/gL8BgMA/gAJ/QYAAwX/A/kEAQj9J/0J9wD6Bf0CBfr7CQH6/fsCAgP8AAcBAf0JDQcADAEB+/4AAgMABvz+9wH6/wkD9v8H+gYD8v4D/P3//Pj/9gsI9fgDAgAEAwT0BQD/+/sCCff/AgQC+P4FAP0C6gMCAwD6/gEN+v0FAfgBAAcE/wkA+v7/AAgC+wP4BeAC/PsF+/sD//0IAAD0Avf++QL9/fv4/BUDC/MEAQME/voC/QT9+wL/+fj/AwQI/QUBBQD6CAf1+P0DAgD4//wB9gIA9wX9AP7//gD/DQIDAQIFCgAICfwBAP77/wgC+90B/wMB/QED9QkABAv6A/wL/QcFBAATAwUA+QQG/AcACfz8AQABAgj//v8HBfsB8wD6AwP7/gP++vcA/Pv++QMI"
+},
+{
+"source": "indian-stock-market.md",
+"section": "Who moves the market",
+"text": "Foreign portfolio investors (FPIs/FIIs), domestic institutional investors (mutual funds, insurers, pension funds) and retail investors all influence prices. Monthly SIP (systematic investment plan) inflows into mutual funds have become a steady source of domestic buying. FPI selling or buying, interest-rate decisions by the Reserve Bank of India (RBI), the rupee exchange rate, crude oil prices and global markets often drive broad moves.",
+"vec": "B/n+/wD8Cgn+/wT+AAD9/fv7/AAE+fz6AwIJ9vfzAf4A//wC/wMG//X+CP8EAP4A+gECAgMEA/8J/wQIBQXoCPsFBwT9Bv4I/foG9QIEAAYAAPn8/QQL+QkA/gQABgIEBAH+KQUEAgP+9/gAAwb7BwP++PX8/wYE/gQFAgD+/wT//gP77QAFB/71/AL7BAP3/hMFBfwD+Af3/P8HBAT8+vn9+QgE+PT9/AD//fwAAgT/AQD7AQD8/P7/+AD9//gG/AgBBPsJ/f79/QAF+/7+AQACBAoD//z9/AADBgX+Adj1+P0D+QECAAv/+AEEBP8A/P/++QH5/RMKDfv9/QEF/PkE/Az3AAP+BP0HBQAHBAEAAfwFBwL0Af7+BPv9BwEG9QME/Qr9B/b6Av8CCPoABgMFC/wEBf0B//0C+QH/AOL8BQUC+v/8+gf/AQUDAPwHBQj+AAQbBQP++//6AhH7BAP/Af8JAPwA/vT+BvgB//kD/wH5/P/7+vwBCAMH+gQI"
+},
+{
+"source": "risk-and-investing-basics.md",
+"section": "Risk and return",
+"text": "Higher potential returns come with higher risk. Equities have historically delivered higher long-term returns than fixed deposits or bonds, but with large swings along the way, including falls of 30% to 50% during crashes. Any single stock is far riskier than a diversified index.",
+"vec": "Avb+CP7/CAMM/gEEAP76B/v4/gsC/AH+CPT6+wDwBPz5AP4E+AQBAf8BAwD/Av70AAYF/wMEAAD/B/oLAgPuAQT+AgsD/wED+wX//gP2AwIG/fz5/foLAwsAAf/7BAQBBgL8L/0IAgT/+QIFBfwD/QMA8vv7AAMAAwYGAfoABAQGAQH69AMD/P4EAgD9+wH4+wgI/fv++QH89gMG/f3/+vgB9Qf+/PUC/P4A/wT8CQb38/8BBPz/CAQD+Af9BP38+QYABwAIAAIA/PsE/QL/+QX8/v4MAgP8AggB+wj1A9n4+vsF+QP8/QL6/P35B//5/vn/+QH6/AwCCvYDAQX8BgEK+QL+8Pr6+vwH+gEBCPwKAwICBAb79AEDBwMEBP7//AP++AH5DPj6/QQF//8DAfkJCgb/Av79/wH39wL8AeYFBgoABAIB+wgC/AQB/f4K/QUGBw0VAv/+AgQB/A/9AfsEBv8HBQAF/f4ECfgD9v8BAAIAAP/7+gUBAwQH+gb/"
+},
+{
+"source": "risk-and-investing-basics.md",
+"section": "Why stock prediction is hard",
+"text": "Prices react to new information very quickly, and new information is by definition unexpected. This idea is called the efficient market hypothesis: in its common form, it says publicly available information is largely reflected in prices already. Markets are not perfectly efficient, but beating them consistently is very difficult, and most actively managed funds underperform their benchmark index over long periods after fees. Short-term price moves are close to random. Any model or analyst that claims to predict them with high confidence should be treated with suspicion.",
+"vec": "//r9CgYABf8DAAYF/P8CAf71/gIJAfv+BgAEAPbs//n/AAkB/Qb/CfgFBAIFAf79+gL+Af7+AwACBAEBCQfx/wIBAP/9CAYC/wAB+AAC/wQH//78/P4E+Q4A/wP7BQECAQj8KQAI/AMC+fgC+QD5/gP++voC/QMA//wEA/oB+gkD/QT77wQJAfsAAQL3Av379A8CAf3/+v798v71BP//+vcC+wQB/v8ABfj/Av4B//z4+v4CCPr+A/37+QIBCQAA/An+AwYIAgD8//0I/f4J/wcCBQH5//8A/wsEAAf7A9j4/QAL/AIAAAcA/f32BAD++voD+Aj8+wgIDfgEA/4A/AAD/An/+v39+f8G+QoGBP4KBQAHCAb9/AL+AAIAAP4A+wf3+Qb5D/n8A//9AfoEDv4JE/v+CPr/BP37+/4E+d8C/wYI/v8H/Ab9+wUA+v4N+AIEBAIcAwEH//0E/Qr6/fkCAgACAvsF///9BvwB8/gG9/36AQP8/gcHAQQDBAIA"
+},
+{
+"source": "risk-and-investing-basics.md",
+"section": "Time horizon",
+"text": "Over days and weeks, prices are driven mostly by news, sentiment and flows. Over many years, prices tend to follow growth in a company's earnings and cash flows. The longer the horizon, the more fundamentals matter and the less daily noise matters.",
+"vec": "Bv37AgcBBwIB/AIGAwMBCP/y/gQC/gT/BgAB//7uAfsA/wIF/gUABf0GAfr//AACAAIB/QAG/gYDBwP8Af/sBgAA/wj5Cf8FAAUE/AL8AQIGBPr7/QQJAQX+APr0BgH+AvwCKQIO/QH+/fsH/wH5AgH6/fn//wX+AAIIBAABAwgH/gf88gMKBf0A/P70+gH6+BEGAv//7/8A+f8FA/35+fYA9wsC+fv+/gD/BAP9CwAAAQACDP7/Av7/9gIA/P71+wb8/QAJ+/z5/f4F/QT++wX6Awf++wL9AwX9Av/6Bdv59/4O/fv/AAMD9P32Afr3/fsB+QD29QcFDvYC/AT2AAIG9wr57vr+AP4I/AQJBf4F//sGBQH0/wMAB/wGAwcD/QH1/AEADfj7B/4BBAEDB/sHEgT/BPj+/P//+f3/AOICBwUE/gED/QMCBAIC+wQK+wMCAgcY/wL9/QkJAg0BB/z+AQIJ/wQD/v4AA/wD9f0D/QEDAQMH/QEI/vz8+/8F"
+},
+{
+"source": "risk-and-investing-basics.md",
+"section": "Diversification",
+"text": "Diversification means spreading money across many companies, sectors and asset classes so that one failure cannot ruin the portfolio. Index funds and ETFs (for example on the Nifty 50) give instant diversification at low cost.",
+"vec": "Bfr7BAb6B/0C/Qn6//oHAvr4+wIG+/78CAEA/fzvA/z5AAIE/gD9DvoB+wEH/fX7//8A+/kDAgcECQIFBgb0BQEC/QH9/wYA+QX9///9AQYI/f35AQMC+QX8+goCAAQAC/8BLAYFCQT+AQIF/wED+wL8+fX3/Qj//wIEAPf/AwQFAgQG9f0GAfwCCAX3BAD5+xAEAvkD/v379v4ECvz8/fj79QwB+PkD/Pn7AQACBwLz+P78B/75Bf3/9AICAfoG/AT8B/4IBAD6/gIL/wMD+QgCAQX/BAUDBQYC+Qz2/dz//PwCAP79+Pn+/f0FA/z4Avz/AAMA8gkBB/wCAwoD/voC9v/27gH9AAIAAwD+BwINAgH+BgX7/P0BAQMCBQAD9Qb5+/r/CQDx/QQCAfr+AfwED/8GBgIA/f0C+/v9+eUDAQQI/QIC/ggA/wMAAwQT+gMEAwESBfv8+gQGBhEBBvwBAwUECPn/+PwCBvwF9vcDBAYD//34+wAJAAf/+QIC"
+},
+{
+"source": "risk-and-investing-basics.md",
+"section": "Systematic investment plans (SIPs)",
+"text": "A SIP invests a fixed amount at regular intervals, usually monthly, into a mutual fund. It builds discipline and averages the purchase price over time (rupee-cost averaging), so investors buy more units when prices are low and fewer when they are high.",
+"vec": "BPr4/v34C//+Agj5AwAA/fv2BQYK9/n7BAAC9/3uB//8+PwG+AUNA/cDAvv+APv+AP0AAQcA/gEICAMCA/7wDvsE/AoEBP4F/v0B+gECBgz+/gAAAQII+AX8+QL8/QcDBAH6MAYG/vsF+vQDBwX7BAj69fn6/gcE/AME/P4BAQUAAAQD9gIKBv/4//z7CAL5/RICAwH//wT++QICCQIC+/T77w0F9ff9/v36AAMDBP/29wH6/AH9AAAC+fgE//kIAAgF/QAB/f3/+/8CAAf8AAX9AAYDAQQDAf8AAgD4/9z59/8F+gD9/gQH/gQE/wb9+P0KAAf7/AgGCvkD/QUF/Pj+9wgA+Pv3Avn+/QYCA/wD/P8DAAj8/AEAAgT+CPz/9wQAAAX7CPr8//4AAfwD/vwCB/8GBAn/Avz99wACAOAD/P8C+wIB+QoFAQID/vwGBQT3/QQXAgD+/gP7CgwACgD9AP0NBAH/+v0J/f4I/PsC/gP+AwH/+gMCBAIF/wkF"
+},
+{
+"source": "risk-and-investing-basics.md",
+"section": "Common behavioural mistakes",
+"text": "- Overconfidence: trading too often because of a belief in one's ability to time the market.\n- Loss aversion: holding losing stocks too long hoping to \"get back to even\", while selling winners too early.\n- Herd behaviour and FOMO: buying because everyone else is, often near a peak.\n- Confirmation bias: looking only for information that supports an existing opinion.\n- Recency bias: assuming recent trends will continue indefinitely.\n- Anchoring: fixating on the price you paid, which the market does not care about.",
+"vec": "BPz+AwEACgIF/gX6/gP9Bvv5BgQC+f/7Bv0D+vjtAf/+A/oF+QEFBv0HAgD+AQL6/AH6/f8B/wcGCv4GCwD0BQMEAQX7CAEB//8G/P4C/QoGAgH6/fcKBwcEBPz/AAACBgLzLf8G/gwC/PwDAAL4AQf9+/0AAgUF/QMJAPr6AAn/+///+gMICgH+BAD9/wD5/AwM/wAD8wX/+gD9AQL8+Pj/+AsB9/v+/wH+/f79AgL5+/4BCPv7AgEC+/4DAvz1+f74/AAF/AAAAPgBAQYC+Q/9Agr/BP4EBAQD/Qb9A9f4AP///gMC/gX//P32AwP2/fgI8wv89gkED/7/AAQDBwIG/AL+9////P4C9gf/A/8GBgIIBQP88/3+BQL6BvgF/AT3+wr4Dvn1AP3+/vsHCfwEDAH7AgEKAvj9+gIEAd33BAcB//8B/QH8BgT5BfwB/QkEAQUVBfoC/f0B/wn7BgIC/v0DB/sF/wQECfv/+v3/+P72/vsA/v4E/wL9Bv8D"
+},
+{
+"source": "risk-and-investing-basics.md",
+"section": "Leverage and derivatives",
+"text": "Futures and options (F&O) and margin trading magnify both gains and losses. SEBI studies have found that a large majority of individual traders in equity F&O lose money; a SEBI study covering FY22 to FY24 reported that about 9 out of 10 individual F&O traders made net losses. They are not suitable for beginners.",
+"vec": "/fj+Af8FCQEFAQEABfv9/fn9+AUB//0BCfz7/fjtBfj/+/wH/v8A/wABAQL/AAH5AQAF/gYJ/gv/BfwL/f7pAwABAgH8CgH8+AEE/AH8+QD//f/9/fwKBgr/AQAGAAEEAwEDLgIIAAEE/QL/C/38AgIA+v4A/AME/QUHBfr++wcC/gT79f4EBP7+Bv39AAX8AAsJ//8C/gD89AQH/wT29/r99g8A+PsD/vgEAAHzCwH8+gACBP4C///9+Pz+/gP5+Qj+APYD+gMEAPoGAf0B+Af9+QQDAf79Bwj8/wUAC9T5+PcF+wEB/f8BBvv9AQL69/oF+AX9+AcICfgI+QYDBgIDAQL49/78/QgC/gP9BvwLAwQGBQH3/AQA/wL4BfcI+wD9/AD6C/cA/gYGAf4FCQIKCfwBCfUA//z3+AD+/+YBCQIC/wYA+QgDAQT7/gEHAQACBQcWAvv/A/oHBA8BA/YB/v0FAP0C/P4FCP4F+gEB/AYI9wIHAQIDBAIE+AIB"
+},
+{
+"source": "risk-and-investing-basics.md",
+"section": "Basic risk checks before investing in a stock",
+"text": "- Do I understand how this company makes money?\n- Is the company's debt manageable?\n- Am I comfortable if this investment falls 30% or more?\n- Is this a small part of a diversified portfolio?\n- Is my decision based on research, or on a tip or excitement?",
+"vec": "APv5/gUEDvoB/AcE/QH6Bv7tAAn8/f3+DvsDAvnuBf0B+wMD/ggFAvv/BPsJ/wT2BggA+gD/+gMCBwEDAf7yDfz//QMCBAEA+wT6+Qf8AAQA/wP++/4HCwj+Bv7+/f4DCv71MwIHBQMB/v0FAv39AgEB+/wAAAX+Av8DAwH0AQQEBgX+9QEGBP4BAwD7/QD5/AYJAQH9/AAC+AL+BP/7+fX68gj/9/f/Avv//wH9Bv/++vv/B/8DBfv6+v39//v1+Qr6BQMD9wEI+vwL9gcC/gsF/wP+AAUBBAr//Qj7ANn8+QMA/P39+wAC+f/6Agf4+f0D+QP6+gr+C/oFAQn5/vwG+QD/8v7+/fsH+QP9CP8JCP8BDAb69/7+CAMABfsE+f79//76BwP+AQP/AQH+AP4CCQADA/4DAf76/QAB/uIDAwgD+wn6/AcH/AX7/gIG/gEACgMRBP7+BAQFCBH/A/4E//oFB/4D/fwFBv0F+/f//AIE+/sAAfkN/wH+AwYF"
+},
+{
+"source": "risk-and-investing-basics.md",
+"section": "Advice versus research",
+"text": "Research explains facts, risks and scenarios. Advice tells a specific person what to do with their money, based on their goals, income, timeline and risk tolerance. Personalised investment advice should come from a registered professional (in India, a SEBI-registered investment adviser).",
+"vec": "CwH9AQQEDv8D/QT9BwMBB/TyAAcG/AP7Bf/6/P3zB/3///sD/gkCAQD8Af8CBgP5//z//wH+/v4HAwAFAgDsDQEAAAb+Af3/+wUD9//7BgT/AwP8/QAKAQQAAv37/wYEBv/4LwIHAwcB+/UABAACB/oB+/3+AgX8+QIGBfr9AAb/AQgC7gECAQABCAEGBP7/+wgCBv8A/AH8+AIEBfz//Pv6+QkC8vYFAfgA/v7/AwEAAQMDCwD+A/wF+QED/QEB/gP7//gD+gH8//wG+QMD+gr9+gYAAv8ACwkBAgL4Adj7+gABBfz9+AkC+PsFAgD/9vX/+f/6+gsHDfoEAv39/PgD9wH+8vb///4K9gECBv0I/AkDAQL89gMBAAMABfsA8gICBAH9Dvv8/gYH9/0CAfwJDQD+/v0E/f74+P/6/uYHAgn7/QD8/wYG/f4B9wIQAv4CBQUVAwH7/QMCABH3AAUE/foIAv0E+QAJDQEC9vgB/gEAA/77BP0I/wEC+gIE"
+},
+{
+"source": "sector-metrics.md",
+"section": "Sector-specific metrics",
+"text": "General ratios like P/E and ROE apply to every company, but each industry has its own key numbers. Comparing a company only with peers in the same sector, using that sector's metrics, gives much better insight.",
+"vec": "//r/+wL2BP0D/wL6AgX//f4A/gUG/gADBgX++/jvAf8GBP7//QD+BAD9BQb/APwC+gMGBPwD+gAFBwEDAATqBQgF+/z2BQD8+ggB/gT8+wL+A/n9AAICBw0B+Qj5/wkDAf79LAIJ/wUKAwAGBQEFAPv5/fb+AwsB+wQA+wYABAD8BAb67gAHCAYDAwr7/QD6/RkBBPv++wD9+P4GCPX9/P37/g8D+/cI/v37BQH+B/j/AQQACQECAgAB9f///wQD/wMBAv4B+/v/+foE/QX9BAMI9/8CAf8ECAf8DQMBA9z+9/0I/fkC9AcNA/4B+gX1+AEBAwD5/Qz7DvgCAQP+AfwI+Pz7+//5Av8FA/UD/wID+/8EAgP5/QH4AAH6/AIG9fsC/QkACP/3BP0BAAT4AQEECAUBCf3/+vn/+AIBAuUHAAT8+/v4AP4FAwb3+wAK/AQBB/0XA/r7/f4DCAr+BwAJCQEJBP0B+fYEB/799fz8+wP8AvoD+P4A+QAK+QIH"
+},
+{
+"source": "sector-metrics.md",
+"section": "IT services (for example TCS, Infosys, Wipro, HCLTech)",
+"text": "- Revenue growth in constant currency (CC): growth with exchange-rate effects removed, because most revenue is earned in US dollars and euros.\n- Deal wins and total contract value (TCV): large new contracts signed, a leading indicator of future revenue.\n- Operating (EBIT) margin: affected by wage hikes, employee utilisation and the rupee exchange rate. A weaker rupee usually helps margins.\n- Attrition: the percentage of employees leaving per year. High attrition raises hiring and training costs.\n- Utilisation: the share of employees working on billable client projects.\n- Client concentration and exposure to sectors such as banking and retail, and to regions such as North America and Europe. Spending cuts by clients in those markets slow revenue growth.",
+"vec": "AAEDBP/4BgcCBAf4AgP/+gD8/wAG+/37CP35/v7t/P8B/AQE+P0DA/8H/fv//v0H9QYK/AYG/P4CB/4BBAHtBAcBAQf6Cvr+9QkE/QP//wQFBPYC+wT+Agv7/gb6APv7BgH+LwYD/wIFAf4GAwf7BP//+vn9BAMF/woDAvoGCQn+/wH99AMCBQUE/wf/AwP3+A3/A/39AAoB+/wGBP3+9/z8+BMF9PwF/gD8A/f7CvP6/f8AAgP9BP0F+/0A/PsE9AIHCPr9/wQEAv4AAQAEAv4A/gEDAv38CAX/AQECA9T/+P4DAfsEAv4IB//8APb1/v4CBAb8+AMCCe/9+AEB//sF+gb/9//8AP4CBgMA/AED+QADBQT3/AIA/gH4/v4E+wUCAAX+Cvv3//3/AfoAAQAJAgP9A/wCA/76////B+AB/PkB/f4B/QUDAQP3AwEM/AYDAfkXBgL9/gELAwIGCwX7Bv4GAgQA/v/9CQAD9gL//f4DCwIF+Pv+//r8+wID"
+},
+{
+"source": "sector-metrics.md",
+"section": "Banks and NBFCs (for example HDFC Bank, ICICI Bank, SBI, Bajaj Finance)",
+"text": "- Net interest margin (NIM): the difference between interest earned on loans and interest paid on deposits, as a percent of assets. Higher is better.\n- Gross and net NPA (non-performing assets): loans where repayment has stopped for 90 days or more, as a percent of total loans. Lower is better; rising NPAs are a major warning sign.\n- Provision coverage ratio (PCR): how much of bad loans the bank has already set aside money for.\n- CASA ratio: the share of deposits in low-cost current and savings accounts. A higher CASA ratio means cheaper funding.\n- Capital adequacy ratio (CAR or CRAR): capital as a percent of risk-weighted assets; regulators set minimum levels.\n- Loan growth and deposit growth.\n- Banks are usually valued with P/B and ROA (return on assets) rather than P/E alone.",
+"vec": "Bf/8/gYBBwEF+wP3AAT//fv9Aw8E/wP/DwD+//brAgUFAAAB+QgAAPwBAQcG/gP//QAE8QAHAAACBAgJBP/lAQf+BP71CAIC+wP+/gQAAQQDAPv3AAH3/gH9//7///0D/AD+KwgEA/3+/gADBQACAwXz/PcC/wQD+QIE/PsC/QQB/P/99v0GAwUHAP///QH99wf9B/n9/AcB9f8BAQD8/P/1/AoB8/wD+wEB//j7Bvz9/gMBAPz6Av8H6/0C9/kA9wcCBAMGAAAEBgAA+gT6+QMJ/wb9B//9CAgACQcABdkD/PsFAwH//P4B/f4AAAf9/PgABAIBBAYACvEGAQEE+wAF9fwB9P0GAAD//v/+AgD/+wH+CAX4+Ab6/An3Cfz++AAE+QkBB/36C/8BAfn+BPgIBQIBCwICCPoG/AH/AuAA/P4D+wH/+QQGBQD7Af8G/Av/CQIVA/sB+QYPAgoBDgEBA/4GAv79AfgGBfj9+wgB/gQCAwMA9v0AA/wG/P0D"
+},
+{
+"source": "sector-metrics.md",
+"section": "FMCG / consumer goods (for example HUL, ITC, Nestle India)",
+"text": "- Volume growth: growth in the quantity sold, separate from price increases. Volume growth shows real demand.\n- Rural versus urban demand trends.\n- Gross margin: affected by raw-material prices such as palm oil, wheat and packaging.\n- Advertising spending as a percent of sales.\n- FMCG companies often trade at high P/E ratios because of stable, predictable earnings.",
+"vec": "A//9/AcBBQP9+gTzAQMB+gP9+v8J/vv5Dfz+/PfnAwcKA/8EAQb+AwQDBvz6Av8AAf4JBP0C+v8I/woHAgHpBAUDAAD8DAEB9wIE9wIB/vr9CfT++v4C+Qn9/AP6/v4BAPz9MAIGAvz9/wIJBAL8Bv79+Pj9+wYE+wkI/f8CBgr+9/8A+f4DAQEHBg75Av/x9xMABfsD/QoE9v//Agb++fwA+hAC+PoBAfwDBPr4B/35Av7+AgMAAQD9+vsCBP8C+gUB/v8KBv4CAAH/AAX9/wQD//78AvwECQEABQT9ANoG//kF+/v9A/wJBAICAPf6/P4IAwD3/wUDCfP+/gEE//z9/fz/8wX7/vwGCQACBP8A9QEGAf39/Pz3AAD+AQYA/AP99Qv+B/r8Bf/7AP77BwIJDAL9//0D//7/+vkBAeT9+gQB/wAGAgUEAwL5BPwH+QcA//4XBvj8+/wBAAsEDAQGBwACAQcC//kCBf0B+/0E/gIAAvsBAf4CAP4D+vwL"
+},
+{
+"source": "sector-metrics.md",
+"section": "Automobiles",
+"text": "- Monthly sales volumes, which companies publish at the start of each month.\n- Market share within segments (two-wheelers, passenger vehicles, commercial vehicles, tractors).\n- Electric vehicle (EV) transition plans.\n- Commodity costs such as steel and aluminium.",
+"vec": "Av0FBAACAAX9/wEAA/8CAQL7A/0L+wH6Bg0CAfjz/gIDAwEC+QL+AAAA///5AAIEA/4FCAUE/v4HAwQIAfzqBAUD+/34BAH5+AL/9/n6/P3+A/kA/AAI/wb+/QX/BPwC/f0CLwkJA/j5AfoG/Qr+BP3zBPj/BQcA+QMDAP0BCwf++gAB8P8G+wsD/w33A//0/g/+A/wA/gUI+QgABgD9/PwB+AwI9f3+/wEACPoBC/76Af3+AwX8/wMB7///BAcD/gT8/v0CBf/4+QEF//77/wMC/P/+/fn+Av4CCQH+Bdz+AP0EA/4B/AEG+/8E///2+v4EBwT9AAcCDfcD/wQD/gL98/r68P37Bf4GB/oDCf///gAFAQP7+f7//QP9BfwJ+P789Aj9Cfz8AfkFBvz//P0ECggIAfv+//wA9/0BAd8DAQgA/fwBAQD+BwX+/wQP/gEH/fkVAQD/+gD8/wj+DgMCBQUGCP/7Bfz/BgAA7AQH/gD3BQH7AfoG/wP/+QUI"
+},
+{
+"source": "sector-metrics.md",
+"section": "Pharmaceuticals",
+"text": "- US generics pricing and new product approvals from the US FDA.\n- FDA inspection outcomes: warning letters or import alerts on a plant can hurt revenue.\n- Domestic formulations growth and R&D spending as a percent of revenue.",
+"vec": "AvgDAgQACwn8AQYHBQH8/P77/AAGCPz/BAn+APzs/AcA+gX/+gEIAAL/+v/89fwBAgMIAAcE/P0BAP8IBgDrAQP+9/z+CgH6/gb/AQj4AAUK+fv6/P8GCA8CBQIABfT//v72LAQB/AP9//z/AAYDBAcBAPwCBAf9/AUEAP0EBA8A/gX9+wQIAv4C/wr4AP378w7+Afn/AAj+AP4BAvf8+wH++Q38/v7+/QL8AAP8/v7+AAD3CAEFBQP8+gIGAPgD9wT9APkIA/z9/QADBgUJ/gP++QkE+gD8AAn7AgEEBNcDAgX9+/4K+gUJAv/7A/j9+QMF/AP++wb8Cvf8BAUA//0FAP3/8v74/v8DCAH+BPcD//8IBQj7+AH5AgL+Bf7/9P//AAkAEPT3Bgj//vUE/gQHAwD9/PoD+wH+/fkFA+P8BgMD+wP8A/wD/AX7AAMP/QMBA/8XCP33/QIFAAkFBP4J/v8CAAX8/Pf/APv68f8GAgD+//kEAQH///v7+gcA"
+},
+{
+"source": "sector-metrics.md",
+"section": "Metals, oil and gas, and other cyclical sectors",
+"text": "- Earnings swing with global commodity prices, so P/E can look very low at the top of a cycle and very high at the bottom.\n- EV/EBITDA and P/B are often more useful than P/E.\n- Watch global demand (especially China), inventory levels and government duties.",
+"vec": "/wEA/Qj8AAYDAAT6AgL6/gD9AQUH+v7+DwH9AfvsAwUBA/0A/gH+AgQDAQACAP0B+gQKBAED+wIBBP4C/P7tAQv//QX3BgL++AL++//8+/wCAfv//gADAgoF+gT+/wUFAwL4MgEIAgEG/AEF/gED/Pz6+fIABAUB+gUC/gD8BQL/BAD49wEEAgoDAQr6AwP0AAwC/fr8+QMB+wQDAv3/+ff/+QsG/fYB+vsDB/z4EPz9Av4GCwEEAAUE8wP/+QUC/g33/f7+/P4B/wEE/gH9AAr/AQQEAvz5BQP5AQT+Atf7/wEI+f4C+wIF/vkC/AL98v8BAQP6/AoECvUFAgAD//wC+wP69fz7+wEEAfoCA/4E/AH//QH0+wP8AgL7AAkE+gD7AAgADPn3AgQFCAD4A/8JCAEDBfoBA/YB9/3//uEGAQMA+/z7AgUHAwr6/v0J/AUFBQAZBP76/gL9AQcBCwACCgEFBf4DB/j/A/n79gf+AAH9BPUG9wIE+QEG/gIE"
+},
+{
+"source": "sector-metrics.md",
+"section": "Telecom",
+"text": "- ARPU (average revenue per user): the main measure of pricing power.\n- Subscriber additions and data usage per user.\n- High debt and spectrum costs make debt levels important.",
+"vec": "+vz6/QH8BwUGBAX5//8FBv/4BAUP+Pr/CAT3+P30//8H//z9+v4GBvoB+wP8+AAC+QQHAAINAvsJ/wMB/wLnAgb7/gnwAfoB+wMF/wD//f8GAvYDA/gKAAUB/Qr5Bf76/gL+LAf8BAD+/QIJ/An9/fv7B/v7AQb//AUAAwgDDA8CCQX59goJBAwA/gn9Avz5+RP+BP0AAQX++wMCAP8B+AAA9A4A8/v9+QL5BPYBB/z0//n9BAf/+QD+/P8DAvgC8/8E//oD//3+A/0E/Qn4Bff5BwMF/vsDAwUDAv7+At0B/gMD/gP//gAI/f0A/wH7AP7//gf99gUCC/kC/gYE/Pn++QD8+/z4BgP+Af4C//cAAvf+/wL+9QP5AwQBAfn9/AII/wQGCf/6Af4G/QL/BQQJBPwABwX6/QP//fcCCN4G/AP9/P3+AAAEBAn7Av8I/QMCBfkS+/3/AgQFBAECDP8FBAMH/f4AAAADCgEB8wAC+f8ACQIG/fwE+vsJ/PwJ"
+},
+{
+"source": "technical-indicators.md",
+"section": "Technical indicators",
+"text": "Technical analysis studies price and volume history to describe trend and momentum. It describes what the price has done; it does not reliably predict what it will do. Indicators work best as context alongside fundamentals and news, never as a guarantee.",
+"vec": "AgMGBQn+DAX9+wX9AQcBAf//BvsGA//+BgX4/AL2CP0DBgIE//0AA/n9+QD4/AYC+gD//gwC/gYIAwb/CgDsAgMC+wT6/gL+9AIC9gH6+/0CAAIB//4FBQ33AAH6AQUGCgABKgUH//oG+v8DAgQABf/7/fT3AQv9+QMG/gMDBgj6/AUA7QEJAP8A/gv8///49xT/AgH6+Pv+/v4CBQL8A/X7+A4C+f0GAPgABP72Cfv/9v3/Cf/9Bf//+f0JBgMA/QcABP8FA/v7/f4IAwj9Agb//wj++QL9DAf/AgAC/tr5Af8HAP4B/gMIAv3xBPb9+vP9Af/4/QEACPgF+wP5/vwD/gAH+Pz1/AUH+v8K/gT/Av8HCQP6/////PkDB/8C+/76/wT8D/n+AgUC+/4CBPoHAf0ACvIA/vv+AwEACOMFAQMC+Pz+/vsB/fr8/P4Q+gIAAgEWAgUB/AMHBQYCA/3+BAEL/gcCAfr5Cf0C9vgG+QIE/wME/AAE+vsE/QAE"
+},
+{
+"source": "technical-indicators.md",
+"section": "Moving averages (SMA)",
+"text": "A simple moving average (SMA) is the average closing price over the last N trading days. It smooths out daily noise.\n\n- The 20-day SMA reflects the short-term trend (about one month).\n- The 50-day SMA reflects the medium-term trend (about one quarter).\n- The 200-day SMA reflects the long-term trend (about one year).\n\nPrice above its 200-day SMA is commonly read as a long-term uptrend; below it, a downtrend. When the price crosses its moving average, the trend may be changing, but false signals are common in sideways markets.",
+"vec": "+/sD/gP8AvoAAgn+BPn8Bvz4/wMIAgEBDgH7/PTv//gFA/8E+gAG/AIEBv//APz+/Ab///sIAQIGAPwEBgHvBQX5Bvz6AgUC/gED8gABAQf+AwD9+wIEAQoBBAH9BwICBgf/JgMJ+wD+/QD+AQD9BgDwAvIF/wgA/QUG/vsIBwoA/gUB9f0IBP4F/v/1/AL79w8C/QT++wIA+QECCwD99fX/+AMC8wX7Af0BB/79BgQG+AD9Bf7+BfsH+gEGAP349gX8BP4EAgAGAf0GAP8EAgYJ/wL///4C+wEE/wP//9r8AgMK+v8ABwUG+P32/wT6AP0F/Qb4/QMJCPUF/QQE/QUF+AUA8Pz8AwX//f4H/fz+/P0EBgf8Av77APgBEPn++gcF+QT3Dvj5BwH7BvkFBfsBC/4ACfwCAwL8/v75+twB/wUAAPgE9wb8BQcA//sK/gX/Bf0UAgMC9/8G+gsGCgIJ/PoJAQEB+wECCvj99fcE/AEA//8C+wkF+/8B/vgH"
+},
+{
+"source": "technical-indicators.md",
+"section": "Golden cross and death cross",
+"text": "A golden cross happens when the 50-day SMA rises above the 200-day SMA, which traders read as a bullish shift in trend. A death cross is the opposite: the 50-day SMA falls below the 200-day SMA, read as bearish. Both are lagging signals, because moving averages react only after the price has already moved.",
+"vec": "+P8EAwIBBP0EAAb9Avr9Bff2/AYF//3+Cv//Avnn/Pb+/PgAAAX//QELBAQD//z+BgABBwYHAwABBQAEAgPuB///AP/3AwYC+gEB+gP9/wIBAQD8/vwBAgsCCfv8/wAACgQDKwUK9gQD//8BAAAEAgb1+vn+AQMEAPsH+v4IBgj++gcC+vgDBfkFB/77/fz6//0C/fz9/P7/9/oECAUD+wAD+xAC+Aj9Cff/CwD3CwL69gH/B/34Cv4C/AAHAgD8+gcAAfcF/gEDAPv9+v8K/wQFAAUAAQIE/AMC/wv//tv2+wIK/wD8CgMJA/32/wz8+/8F+wIA/wQJDQD//vwA+AEHAAT++P36AgcE/P0I+QQI//YFCwb5/fv4+/8ICP3//AAE/gADCvXzBgQE/P8EBvsCAv3/BP4GAP3+/v/5At/+BgL+/P0C8wQEAQYF/vkF/PkDAwATAwf++AQI+AP9BfgJBvgLAQMCAAD0C/r5/vgA//z++/j8/AYJ/AIB/Pz/"
+},
+{
+"source": "technical-indicators.md",
+"section": "Relative Strength Index (RSI)",
+"text": "RSI measures the speed of recent price changes on a scale of 0 to 100, usually over 14 days.\n\n- Above 70 is called overbought: the price has risen fast and may pause or pull back.\n- Below 30 is called oversold: the price has fallen fast and may bounce.\n- Between 40 and 60 is neutral momentum.\n\nIn a strong trend RSI can stay overbought or oversold for weeks, so an RSI of 75 is not on its own a reason to expect a fall.",
+"vec": "+f74AwD/CP4D/QX/BAD9AQH2/gUKAf78DAj6/vrtBPcGAf4J+wMI//sGBv8AA/3+AAkCAAgAA/4FCQMCBAPwAQIAAf8AAAAD9wIB9vz9BAcIAPr1//0KBg0D/vv5CP7+BwT5KgQG/wIC9///A/77AAX7AP78BQQAAQkH/PkDCAUA+wj38fQLBQEIA/73/AH6Aw0BAwL69gT/+PsCAAAD+vv59wMG9v4A/P/////3DPwD/QECB/z7AwAE9QUEAP378gYCBP8F/gP+/wAF+gT/AQUBAQMB//wC/AH8Agf6A9r/BP0J+QL1CgIFAP7xBwUG///9/QX3AgsDCvP+/Pr9BAMA/f4A9QH4/QUDAwEG+AQJBvwBCAj2/v3+/gD/A/8A+v7/9gT/B/X4//v7BQMEBf8FCv7/Bv8FBAIC/QH9/toJAgEFAAQD8wH7CQEA//0K/QP8+AMVBAMC+wQD+Qb9AgEKA/0FBPwD//sAD/z5+gEB/vz/AgH+/AYG+vj/APr/"
+},
+{
+"source": "technical-indicators.md",
+"section": "Volatility",
+"text": "Annualised volatility is the standard deviation of daily returns scaled to a year, shown as a percent. It measures how much the price swings. Large, stable companies often have volatility of 15% to 30%; small caps and speculative stocks can exceed 50%. Higher volatility means a wider range of likely outcomes, both up and down.",
+"vec": "APz8AwMBBf8MAQD/BgL9Afz1AgQC/QP9CgQA9/nt//cDAgQH+wECAf0BAPb4+/z+/AMDAgIF/QMEBAYAAgLuBv8CBAH7AP/89QYD+f35/AMDAP75Af4L+w39+gj9/AIGAwT9KgQG/wkCAgADA//+AgXx+fv6AAcGAgQDAQAHCAkB/gQG9gIH//sBAgj4+vn59g0D/gL8/v369QUJ//4C+/j68QsE9voG+/wJAvr7CwQA+v8CDf79CQEB9vwJAQT7/AL6A/0GAv3+/AMEAgYAAAX//v4F/wD8/wQBAAf8/d78AfkJ/QT9/P3+Awb9CAH9/vX++/v2/QwICvn9/AIABAMH+QAB7v/7AAEA/vsHBfwBCwIEBgn5+wAE/AH/CAH+9Qf3/AD8Eff7/AICBvkGBf0ICf//APoEAv8CAfj4AeAA/AsE+/r/+Ab5BAoAA/gM/wEFAgEVBP0B/QYD/ggACPz/A/4JA/3//gIFBfkD9v0G9AQDAQT7/gEG+QIAAf8D"
+},
+{
+"source": "technical-indicators.md",
+"section": "Maximum drawdown",
+"text": "Maximum drawdown is the largest fall from a peak to a later low within a period, in percent. A drawdown of -35% means someone who bought at the top was down 35% at the worst point. It shows how painful holding the stock has been.",
+"vec": "/vz6A/oADAML/gn/+wT7BAD+AQAI/fv7Df//9/nrAPwBAgEI+QEGBP4F+/38A//9BQgC/AcCAvsG+//+BP70/gIA/wIABwH+9v8A+AX8AAAE/P36A/8HAAv9AvoC+/gEDf36LAMG/AIF+QUCAfzzAAj7//gDAv8EAgcG+wQDAQsD+gT89fkC/AAF+//+AgH5/Qr8Afr//PwA+QMGBQT/9wD4+QQA+vr8//7+AgL0B/72+wD/CwT9AwYEAAEMA/r7+Qf7AvwK/wMD/vsBCQgB/Ab+/v4EBgv9BQL5/gz3/9v9A/gM/P72+gII/v76Af34BPoBBQP1/AMBDPwEAwD4/gQI+v75+P/5AgP+Bfz/B/0HCf/9BQr9+QL5/gj5BfwB+QMBAAcECfz2BAED/fb6AvkEBfwJAvoAAvv8/vf9/d8KBv4EBwYL/P/7BfwBAP0IAAQKAwER+wQC/AYF/AgDDfoCDgAFCgH++AAHC/7/+P8G+gP/AP3/AgII+/sB/PkE"
+},
+{
+"source": "technical-indicators.md",
+"section": "Beta",
+"text": "Beta measures how much a stock moves compared with the overall market. A beta of 1 moves in line with the market, 1.5 moves about 50% more, and 0.6 moves less. Beta is calculated from past data and can change.",
+"vec": "APYA/v0BCf4F/wf+A/76AP/2/wMI+QD+CgT8/vft/PsMA/wH+wD8A/z9/wT++vv8+AQE/P4FBAEBCQn9CgHvBgIG/Pv9DQQDAgD/+v4C//8AAfn7/v8MBQcA+wP7AAME//n/KgII/ggG/AL/BQX8/gb4+/P++wT8/v4H/QEGBgsEBQkB+AAJAfoD+QD8/wz99gwBAP799AP79/cFBv/6/ff9+/8C+/7/A/wC/P/1DAEH+AMBCvz9BgUE9v8DAQD7+gMABv8G+gEC/v8EAgX+/gYD/Qj/+wH6Af0DAPwAA9vzAP8D+gD//gAM/v/9BfwABP3+AP77/AcIBwAHBP0GBAMI+AL+8/z2+v////4H/P0GAf4DCgsA/P0EAAEABQAC/gT5+P8ADfj6/QD+APoBA/sDB/kEDfwHBfn//Pb9AOD/CgsE9gkH9AH6/QX7+foP9wH4DQAVBPwEAgICBgf+B/4ECfsEAv4F/vgOCPsB/fz8+Af/AAEA+AQF/gX9/wMG"
+},
+{
+"source": "technical-indicators.md",
+"section": "Volume",
+"text": "Volume is the number of shares traded. Price moves on high volume are considered more significant than moves on low volume, because more participants agreed with the move. Unusually high volume often follows news such as earnings results.",
+"vec": "BPb/AQD8CwEF/QP6AgL9AwD6+QEJ/wT7CP75+fnsAAIIAQED+gL+BP0EAf37+v3+AwIG/QQIAAQN/gUDCAP0AwYBAP74BwX99QIH9P/+/v4DAvz9+P0I///1/An5BgYBBAD9KwYD+wAC/AAHA////vv7/fsBAQUA/AYH/P8BBAb9/AYG9/8LAQD9+g/4+/7w/xf4/v4D9wH89AD7BQT+/fv89wz9+vj+AvoAAwD+CgD7+f4BCgL8/wIE+v8DDQQF/gX8BP8J/gD+/fYIAQYCBgUDAAf9//v5AgoA+AT2B9z9BPwIAv8C/v4F+vv4//n6/PoBBgT2/gkJDf0GAwD///sA+wD9+P7v+/0EBwAHAvwDAwIBDgT//Pj7/voDB//7+AD9+QH9B/sGAgQDBP8BBAAGCgP+Bf0E/Pn+/Pf8AuEAAgv9//0E/AIE/gD89/sK/gMJB/0aAf///wP5AAcBCvv+BQYEAQD/+AAECP4G9QEE/Ab/BQABAwAHAf39/v8J"
+},
+{
+"source": "technical-indicators.md",
+"section": "Support and resistance",
+"text": "Support is a price level where buying has repeatedly stopped a fall; resistance is a level where selling has repeatedly stopped a rise. The 52-week high and low often act as psychological levels. These levels are approximate zones, not exact prices.",
+"vec": "+v/9CgQDBgj+/AT9AAACBf39AAQE/vwCB/79/vzwB/gABf8H+P8EA/gCAgH+Af/6A/oJBgQG/wQHBQgBCvzvAv0AAQH8BP79+QEF/P/4AvsHBPgBAv8MBAkA/gX5Avn1Af/6MAUF/gMD+wME/QMBAv/7/vf4AAIB/wEI/vsAAQ0D9wX38v8H/gL+/wf8/Ab6/gb8Af8E9Qb69AMEA/kDAQL/9QwG9fz8//sDBf/6Bf/18P8FBf/1/wAI8QAFA/769v0GAfUGBQT+BvwFAggEAQP//wwEAP4E/wAA/gL9Atr+/wIDBf/y+QYQ//0ABPz6APkB/QEA/QELDfwFAPn6/fsH/f78+vv4Cf0B+gIICf4F9f8CBQT++gMA/f4EB/0B/AMA/P8ABfn6BP36AvkDBv4CBgQABfsGAAIC//wC/9sAAwb8BQQF9f0BB/0K/wAM+AH+AAETAvv8AgQFAP//BP8FAwMKCPoG/vr+DPcF+f4E/P8E//z+/AMH/gMD/wAB"
+},
+{
+"source": "technical-indicators.md",
+"section": "Limits of technical analysis",
+"text": "Technical signals are probabilistic and often contradict each other. They ignore the business itself, and they can be overwhelmed instantly by news, earnings surprises or market-wide events. Short-term price movement is close to random, so any outlook based on indicators should carry low to medium confidence at most.",
+"vec": "BAD8AAP/BgUH/wb9AP8ABAH1CAEJAv38CQMA/v/y//sAAQYF+v4CAPcA/QAC+gT99wL6AwkD//8FBQIACgLtAgUDAQD5BgcA+QID+QD9/QED+/0C+P0AAQ33AP75/PsCBvwBKAEEAwYF+v4AAQD/Af/5/vj6BAf5+wQPAPwGBAv9AwL9+gQM/vwCAgn3AAD68REBAf779v8G+gYFB/z4/v79/QoDAP8E/PIABAH4BAH7+vwBBQACB/4E+P4KAPz8AAX9/wEG/P7++fkGAAcDAgn/AwUD/P//BQsB/QIAAtj4AAgH/vsAAQUHAfjyAPz2/vYF+wT19QIEBvMI+P////4G+/8B9/v3/QUD+f0IAv4CAQQCBwr2+/8B/P79A/8B/QT9Aw3/GPr7A/8E/P//B/8ICff9CPb+CQUCAgEF/uP+A/4CBQD99f77/QL+AwMI8wH/B/8cBwQD/P4G+ggGAfsCBP0JAP4F//8BCvr6/v0B+gT8/gEJAQEG/f//+QL/"
+},
+{
+"source": "valuation-ratios.md",
+"section": "Valuation ratios",
+"text": "Valuation ratios compare a company's share price with what the business earns or owns. They answer the question \"how much am I paying for each rupee or dollar of profit, sales or assets?\" A ratio is only meaningful when compared with the same company's history, its direct competitors, or its sector average.",
+"vec": "A/v4+wT4CgAFAAH3CwP9/gH7+wsAAgAEBwf7+/ruAP4F/wMC+gICAfz/A/z7/voA/AcG/f8D+gICDQAABQHtB/4DAf/zBAEB9f0C+AL9Af/9Bv0EAQIJBgz+AAD5AAb/AfkALQQM/fz8/PwFAwABA/v5/P38/wf0/gID/v7/DAUD/v/58QAEBQf9/wr8+v/99w/9+gL7/P/5+gIFBfsA+AD88Q799v0E+gD+APoCEP77/P4ABQMBBQf97/kFBAD69QoACQMG/gP7BP/7/AYCAgYF+gj+/QIEBwQABfv3AuX7+f0LAPwE+P8I+gL3//38AgD4AgH/BRD9D/oDAwn7/fsF+vz+9f7/+fwFAAQEBAgH/gP+DwQA+/z9AQP/BAAE9gP9/QkCB/3/9/8AAgP/AgIBDgcBCAAE+vf+/P/9/uQBAQf+/gH8+QEH/wP2/wEI+QYBBPsV/wIA/wAICAb5DfwDBgAFBAME+fwHCAX79gD7+AQF/v/+9v4F/AAEAwMF"
+},
+{
+"source": "valuation-ratios.md",
+"section": "Price-to-earnings (P/E) ratio",
+"text": "P/E = share price / earnings per share (EPS). A P/E of 20 means investors pay 20 for every 1 of yearly profit per share.\n\nThe trailing P/E uses the last 12 months of actual earnings. The forward P/E uses analysts' estimates for the next 12 months. When the forward P/E is lower than the trailing P/E, analysts expect earnings to grow.\n\nA high P/E usually means the market expects strong future growth, or that the stock is expensive. A low P/E can mean the stock is cheap, or that the market expects profits to fall (a \"value trap\"). P/E is meaningless when earnings are negative or unusually low because of one-off items.",
+"vec": "AQT5/QT9CAMKAwj7Afz2//71+wYM/v0DDQT++/XvAvkD//0G+AAEC/sDAP0FAvb5/AcAAgED/QIECv4BAgPs/AP9/Ab5BAIA+AEE/Qj+AP4EB/sE/gYMAgr+AP72/wUCBv77LQIJ//4C+v4GAfz8/v/4+v37AwYBAwYEAgD/CwwFBgH9+AIIAAACBP/6/Pz7/hIAAf/++QP99wICAv79+Pr7+wcAAfwBAPr/+v/5BAP9/QD/Cfz9BQIA9f4FBQD79AYABf4K/v0F/PgC9QIEAQgB/QD+AQEBAAcE/QD6Cd3+AfgF+PgDAQEI/fr8/Qn9+wEE/gD3/w0LBPkB/QH//AIE+wP99/z2+fwA/wEHAQYL//4EAwfzAAT8/gP5AAIF+Ab6AQT/CvwAAAL7AAAACAMFCgQCBvoE//MB+AL9/dsCAQUECP7/8wQB/Qb4/v4I9QUFAf4WAfz7+gUIAwT+B/kEAPoGAvsE/gADBf4A+wAA/gEBAvoI+gUG+AEFBgQE"
+},
+{
+"source": "valuation-ratios.md",
+"section": "Price-to-earnings (P/E) ratio",
+"text": "or that the market expects profits to fall (a \"value trap\"). P/E is meaningless when earnings are negative or unusually low because of one-off items.\n\nTypical P/E levels differ by sector. Fast-growing technology and consumer brands often trade at 30 or more, while banks, utilities, metals and other cyclical businesses often trade between 8 and 15.",
+"vec": "AgP6/f/9BwIKCAX6Bf76AP76/Q4L//8ADAT++vjt/f8A/wEG+QADCP78//sCA/j9/QMCBAIF9wIACgH/AwLr/Qr++wLzBgH/+AIF+wf9/f8CBf0A+gMIBgj9/AD3/QQBAf33LwEK/v4C+/0F/vv/AgD2+f3+BAgB/QYHAAT+CAsCBP/19QMGAwIIBAP7AP/4/w8BAf3/+AT6+QEFA/378/v8+wX+Afr9/Pz//P/6CgH5AfsCBv3/AQYC9v8GB/35+Ar/AP0J/wMC+vsE/Af//wcD/gL8/gIABQMF/wD3BtwC/vgEAPcB+wkI/vj+AAP7+wIFAAH1/wcHCvgB/wAE/gYD+v4A9gL2/Pz8Af4FAwUJ/v8DAwL1/gL8/Qb5AgYD+wn6AQYBD/74/AX8/wH/BAEGCAMEBfkDAfUB+AUA+uAFBAYABf/+9QII+Qf6//4D+AYFBAAZAvn6/gIGBwP9Cf4EBvsCAfsC//4DBv79+AEB/QUDAfkK+gEI9/wLAwIE"
+},
+{
+"source": "valuation-ratios.md",
+"section": "PEG ratio",
+"text": "PEG = P/E divided by the expected annual earnings growth rate in percent. A company with a P/E of 30 and 30% expected growth has a PEG of 1.0. A PEG near 1 is often read as \"fairly priced for its growth\"; well above 2 suggests the price already assumes a lot of growth. PEG depends heavily on growth estimates, which are often wrong.",
+"vec": "Avb9+Qb7AwoJBQP4A/79//73+wcJ/gD9BwL4/fvrAgMG+fwI+AL9BPz8/vr9AvQCAAYFAAEC+Aj/CQAAAQXwAgEA/v3wCQED+QL//gf7AwL+CvoA/wMPBA0CAgD5+AMCA/wBLwEGAf0D+/0DC///BP76/vr/AQn5AwAE/QEBBQsEBf/49f8FAgMFAAP8+/v+/A4AAfv+/QT8+AUD///69/799gz/+fcE/voG/fr/DP7/AwgCBfwDCwX99gABBQH89gYABP0D/QIFA/8F9wQIAAQBAQb+//4FBAIBBAH8BOAC/f8HBv0C+gAC//37/QD3/AIA/v71AwsIC/kC+Af/AAMF/fj78//2/vkE/v0J/wUL//oHBgf0+wEBAAf3AgUB9gb3AgMACPv/AP3+Avr+BAECB/7/BfwD/fP/9wIA/t4FAgMBBgP7+QQE/wX+//4J9QH+Cf0RAfv/+AUICwEACPoJBfsDBQEG+wEJBAAG+QD9+QIG//wK/gMF9vz+BAP9"
+},
+{
+"source": "valuation-ratios.md",
+"section": "Price-to-book (P/B) ratio",
+"text": "P/B = share price / book value per share, where book value is shareholders' equity (assets minus liabilities). P/B is most useful for asset-heavy businesses such as banks, insurers and NBFCs, where book value reflects real lending capital. For asset-light companies (software, IT services, consumer brands) a high P/B is normal, because their real value is in people, brands and software that the balance sheet does not record.",
+"vec": "/v74+AT5BgIJBQH4AQP6/gL9/QoF/fz/DAH3/PrrBgEE/wIE/QAFBvwCBAIFAvz+AAMB//4F9wUCCQIFBP/sAwQD/gL2AwAD/gQC+AX5Af0DBfsBAgAL/wP/AAD8AwcDAfwCLQEJ9/8A+QYDAf4C//32AwD7/QP6AAUAAf/8BggEAAL/9P4CAQACAQP+///++Qv9Avv+/AH++AQDA///9f0B9Qb5/P7+9QP5/f0FDQH9+gP+Cf37/wX/7/sDBwIA9gX/B/0E/gD8AfkCAAEC+wQBAwb6//r/BQkBB//4AeAB/voGAfkE9AMM8fz5/f8B9/j7Afz1Ag4ECPUFBQcA+f0A/P8A9QP+///8AAMLBgML/AAACgb1/wD6AQD2BQcB8///Agb9BQD/AgMHCPr5BQEFCg3/B/0DAfH6/AICAd8B/QkAAgL+9gQH+wH5+/0K+wcIBPwWCvz6/gcCCQj+C/oCA/0BBgAE+vwCDgL2+AYA/QQF/QP/+wIC/wIEAQIG"
+},
+{
+"source": "valuation-ratios.md",
+"section": "EV/EBITDA",
+"text": "Enterprise value (EV) = market capitalisation + total debt - cash. It is the price of the whole business, including what is owed to lenders. EBITDA is earnings before interest, taxes, depreciation and amortisation, a rough measure of operating profit.\n\nEV/EBITDA lets you compare companies with different amounts of debt, which P/E cannot do fairly. Values of roughly 6 to 12 are common for mature businesses; growth companies trade higher.",
+"vec": "Af4B+Qb/CQkKDAL8//r7/f76/QwE9wYCCgL7//zwAQMFBwII9wADAvsBAPf+Av8A/AYGAQAD9gQABPsCAgDuCAf//gL3/gf9/v77//4A/P/8Bf8FAgcNAQkG+gf4/QIIAAABLQIN+/wF9vYEAQAAAQL4AP37AQYA+P4GAQL+CAgABQH89gYBAQMG/Qb9Afj59gQF//r8/P8B+gEKB/37+QEA8RAB9fgA/wAAA/z+Df39AQT7Bvz3AwX/9f7/AQMD/gz8/wAA+/8DCAMCAAL+BgYH+wb/Bgf+BQQB//z8Bdv/9f7+/Qr/+wD/+v/9/wEAAfkH/vv9AAr+DfgDAAEK//0G9v8G9fr2/PkAAvsFBQECBAP/Cwn5/Av9/Ab4AgID/AT6APv9Cvj4/QL/BAIC/f4FBv0DBAH7A/oA9v//AeAE/gH7B/v59QL/+gj7/gIM+Qn+A/wYA/39/gkGAwQBC/oFBPYCAwECBQAA/wr89/////4BAfz+9voC+AEG/gYC"
+},
+{
+"source": "valuation-ratios.md",
+"section": "Dividend yield",
+"text": "Dividend yield = annual dividend per share / share price, shown as a percent. A yield of 2% means 2 in dividends per year for every 100 invested. A very high yield can be a warning sign: the price may have fallen sharply because the market expects the dividend to be cut.",
+"vec": "Avv6AQj/AwQGAQQA/wL8BvX2AQEO+P/+BwH5+/nvAwP8APwD/AYBBfsAA/v/APr5BgQD/Qj++QIHCAAHAgXuAAP/AQj7AQQD+v0B9QP8Av34Dfj8/QEMAw39BAf2/v4H///7KQIIAAD++/4EA/79AQL///X4BQj6AwQHAvgCCgcIAgIG9gQF/vr7/AH9//wA+wz8Bf4D+AX/9AICBPoE//z99A8B//cCAvkBA//5CAT68gH/Cf8BBwT++PoDAQD98gb9CPwJAv0DAAAB/wAGAgcDBgEEAAQAAgoEAQf2/+H7Av8EBvwC+/0F+gD1A/b8+///APr5/Ar+C/0JAAT/Af0A+//88/z5Avz8BfkECAQJBvsBCAr49/z6APz6Avr79wD59wIBBf/2APwB/vn/Bv8DCgABAQEHAfr7AAD7AeAE/wr+AggC9Qv5/gj//gAP+gMGBgISBAIA+wUJCAcDBPL/Cf8HCAIC/v0GCPkG8wEH+QECAgX6/wD//P/6/gcF"
+},
+{
+"source": "valuation-ratios.md",
+"section": "Market capitalisation",
+"text": "Market cap = share price x number of shares outstanding. In India, SEBI's classification ranks listed companies by market cap: the top 100 are large caps, 101 to 250 are mid caps, and the rest are small caps. Larger companies are usually more stable and more widely researched; smaller ones can grow faster but are riskier and less liquid.",
+"vec": "Afj99v8ADwAKAwX5CQACAP/4+ggE/gD5EPr9+vrpCP8NCP3+/f4D//gIBf/2Af3/AwIE//wJ/QP+/wQHBADvAgcABfzzBAYD+f4A+voBAAH7AQEB/wEQAQf+/wX7A/8AAgj+KgkE+vwB9vsCCP/8BgL1//r+/Ab//QEA+fkLBAUAAwAC8/8BAQL9//78+gP9+xACAfz+8gP9+QMFBv0A/QD+9xEI9PgE/P/+//0EB/3+/QEECvz7AAUA+PwF/PgH+Qz7BQACCQD/BfwH/QMEAwEJAgn5AAD7/wX/BAj3+d8CAvkD9wEE/wIB/Pv6APv6/PwBAgP2AgwGC/gB/QQC/v399vv39AX//fz9Bf8HAAEBAAIADQL8+gP8AgH9BgX9/QD8/QH/Bf8AAP8EBQUIAgEIDAQIAv38BP0B9gIB+OIEAwX8+gD/9wv9AAj5+P0IAQQIAP4UAgQA+AH8BAz5DP7/B/sBAAgH/vwCB/wC9QEB+PsA/AX+APn9/f8B/gIF"
+},
+{
+"source": "valuation-ratios.md",
+"section": "Common mistakes with valuation",
+"text": "- Comparing P/E across unrelated sectors.\n- Treating a low P/E as automatically cheap without asking why earnings might fall.\n- Ignoring debt: two companies with the same P/E can have very different risk if one carries heavy debt.\n- Using one year of earnings that was inflated or depressed by one-off gains or losses.\n- Forgetting that analyst targets and forward estimates are opinions and are frequently revised.",
+"vec": "/wL3AAj6BQIG/Qn7Bf/7/PoA/Qr9AQIECgX7/PnqBAQE//4C/gQEAvz/APsC/vr5AQgD/QIC+AcFC/0FAgPtAwv/AgH6AwX9+QkG/gf+/AMDBvkB/wADAwr8BP79AgIEB/v1MAMJ/wIC+/8CAQD/Av35+/7/AQb3AQEGAv78BgkAAQH2+foGBgUECwb9+vz++RX+/wD7+/77+wUABP0B+f7/8hL++/79/v78+gT6Cfz7/QH/BgL/BwP79PwB//z6+QX5A/wB/QIDAv8B9wT/AQYG/QEAAgICBggCAQL6C9r9APwC+vv/8AMB/f79/wT5+f0B/AH8+RAHC/UEAgIDBAIC/QIA9P759gEC+QAB/wEN+f7+BAX69wME/gT4BAAH+gb4AQP+C/v4+QP8AQIABAMHCgIABQMD+Pb9+wX//+MBAwX+A/72/QEEAQf4/f8G+wf/BQAYAff8AgECCgMBBQACAvoBBfwDAf0CBwYF+/r+/gEAAvoI+v0D+AIF/gMD"
+}
+]
+}

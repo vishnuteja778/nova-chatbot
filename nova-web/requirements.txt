@@ -4,3 +4,7 @@ python-dotenv==1.2.4
 pypdf==7.0.1
 yfinance==1.8.0
 httpx==0.28.1
+numpy==2.4.6
+# Local embeddings for RAG. If a deploy fails because the bundle is too large,
+# remove this line: search falls back to BM25 keywords automatically.
+fastembed==0.9.1

@@ -28,6 +28,10 @@ const backdrop = $("backdrop");
 const STORE_KEY = "nova-history-v2";
 const CODE_KEY = "nova-access-code";
 const THEME_KEY = "nova-theme";
+const LIB_KEY = "nova-library-v1";
+const AGENTS_KEY = "nova-agents";
+const MAX_LIB_DOCS = 20;
+const MAX_LIB_CHUNKS = 400;            // same limit as the server
 const MAX_FILES = 5;
 const MAX_BYTES = 4 * 1024 * 1024;     // same limit as the server
 const MAX_FILE_CHARS = 15000;          // about 4,000 tokens per file
@@ -46,6 +50,9 @@ const ICON_COPY = '<svg class="i-copy" viewBox="0 0 24 24" aria-hidden="true"><r
 const ICON_CHECK = '<svg class="i-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
 let convo = load(STORE_KEY, []);     // [{role, content, text?, files?}]
+// The user's RAG library: [{name, chars, embedded, chunks: [{section, text, vec}]}].
+// The server can't keep files (it's serverless), so the browser keeps them.
+let library = load(LIB_KEY, []).filter(d => d && d.name && Array.isArray(d.chunks));
 let attachments = [];                // files waiting to be sent
 let controller = null;               // lets the Stop button cancel a request
 let activeStream = null;             // the reply being revealed right now
@@ -223,7 +230,7 @@ function chipHTML(a, removable) {
   let meta = formatSize(a.size);
   if (a.status === "loading") meta = "Reading…";
   if (a.status === "error") meta = a.error;
-  if (a.status === "ready" && a.truncated) meta += " · first 15k chars";
+  if (a.status === "ready" && a.truncated) meta += a.inLibrary ? " · full text in library" : " · first 15k chars";
   return `<span class="ext">${escapeHtml(label)}</span>
     <span class="info"><span class="fname" title="${escapeHtml(a.name)}">${escapeHtml(a.name)}</span>
     <span class="fmeta">${escapeHtml(meta)}</span></span>` +
@@ -289,6 +296,12 @@ async function readFile(file, a) {
     a.truncated = true;
   }
   a.text = text;
+  // Too long to fit in one message? Index the WHOLE file for RAG, so Nova's
+  // Researcher can search all of it instead of only the first 15k characters.
+  if (a.truncated) {
+    a.inLibrary = true;
+    addToLibrary(file);
+  }
 }
 
 function addFiles(fileList) {
@@ -317,7 +330,8 @@ function addFiles(fileList) {
 function buildContent(text, files) {
   if (!files.length) return text;
   const blocksOfText = files.map(f => {
-    const note = f.truncated ? ' note="only the first 15,000 characters"' : "";
+    const note = f.inLibrary ? ' note="first 15,000 characters only; the full document is in the library, searchable with search_documents"'
+      : f.truncated ? ' note="only the first 15,000 characters"' : "";
     return `<file name="${f.name.replace(/"/g, "'")}"${note}>\n${f.text}\n</file>`;
   });
   const ask = text || (files.length > 1
@@ -512,6 +526,11 @@ function createStreamer(bot) {
       schedule();
     },
     end() { ended = true; schedule(); },
+    // Throw away everything shown so far (the draft) and start again.
+    reset() {
+      target = ""; shown = 0; stamps = []; base = 0; lastTotal = 0;
+      bot.body.innerHTML = '<span class="thinking">Revising…</span>';
+    },
     stop() { target = target.slice(0, shown); ended = true; schedule(); },
     text: () => target,
   };
@@ -561,7 +580,11 @@ async function send(text) {
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json", "X-Access-Code": accessInput.value },
-      body: JSON.stringify({ messages: convo.map(({ role, content }) => ({ role, content })) }),
+      body: JSON.stringify({
+        messages: convo.map(({ role, content }) => ({ role, content })),
+        library: library.filter(d => d.chunks.length).map(({ name, chunks }) => ({ name, chunks })),
+        agents: agentsToggle.checked,
+      }),
       signal: controller.signal,
     });
 
@@ -582,11 +605,18 @@ async function send(text) {
       if (done) break;
       if (!bot.el.classList.contains("streaming")) bot.el.classList.add("streaming");
       pending += decoder.decode(value, { stream: true });
+      // "\x04" means the Reviewer asked for a revision: the new answer replaces the draft.
       let out = "";
       while (true) {
-        const start = pending.indexOf("\x02");
+        const start = pending.search(/[\x02\x04]/);
         if (start === -1) { out += pending; pending = ""; break; }
         out += pending.slice(0, start);
+        if (pending[start] === "\x04") {
+          if (out) { stream.push(out); out = ""; }
+          stream.reset();
+          pending = pending.slice(start + 1);
+          continue;
+        }
         const end = pending.indexOf("\x03", start);
         if (end === -1) { pending = pending.slice(start); break; }   // marker split across chunks
         bot.tool(pending.slice(start + 1, end));
@@ -625,6 +655,107 @@ function stopReply() {
   if (activeStream) { activeStream.stopped = true; activeStream.stop(); }
   if (controller) controller.abort();
 }
+
+// ---------- library (RAG over the user's documents) ----------
+const libraryEl = $("library");
+const libraryScrim = $("library-scrim");
+const libraryList = $("library-list");
+const libraryInput = $("library-input");
+const libraryCount = $("library-count");
+const agentsToggle = $("agents-toggle");
+const ICON_TRASH = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg>';
+const pendingDocs = new Map();   // name -> "Indexing…" or an error, while uploading
+
+function libraryChunkCount() { return library.reduce((n, d) => n + d.chunks.length, 0); }
+
+function saveLibrary() {
+  try { localStorage.setItem(LIB_KEY, JSON.stringify(library)); }
+  catch { toast("Your browser's storage is full. Remove a document from the library."); }
+}
+
+function renderLibrary() {
+  const items = [
+    ...library.map(d => ({ name: d.name, state: "ready",
+      sub: `${d.chunks.length} chunks · ${d.chars >= 1000 ? Math.round(d.chars / 1000) + "k" : d.chars} characters` +
+           (d.embedded ? "" : " · keyword search only") + (d.truncated ? " · trimmed" : "") })),
+    ...[...pendingDocs].map(([name, s]) => ({ name, state: s === "busy" ? "busy" : "error",
+      sub: s === "busy" ? "Indexing…" : s })),
+  ];
+  libraryList.innerHTML = items.map(it =>
+    `<li class="lib-item ${it.state}"><span class="meta"><span class="nm" title="${escapeHtml(it.name)}">${escapeHtml(it.name)}</span>` +
+    `<span class="sub">${escapeHtml(it.sub)}</span></span>` +
+    (it.state === "ready" ? `<button type="button" data-name="${escapeHtml(it.name)}" aria-label="Remove ${escapeHtml(it.name)}">${ICON_TRASH}</button>` : "") +
+    `</li>`).join("");
+  $("library-empty").classList.toggle("hidden", items.length > 0);
+  libraryCount.textContent = String(library.length);
+  libraryCount.classList.toggle("hidden", library.length === 0);
+}
+
+async function addToLibrary(file) {
+  if (library.length >= MAX_LIB_DOCS) { toast(`The library holds up to ${MAX_LIB_DOCS} documents.`); return; }
+  if (file.size > MAX_BYTES) { toast(`${file.name}: too big (max 4 MB)`); return; }
+  pendingDocs.set(file.name, "busy");
+  renderLibrary();
+  try {
+    // The server reads the file, splits it into chunks and embeds them.
+    const res = await fetch(`/api/library?name=${encodeURIComponent(file.name)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/octet-stream", "X-Access-Code": accessInput.value },
+      body: file,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      if (res.status === 401) accessBox.classList.remove("hidden");
+      throw new Error(typeof data.detail === "string" ? data.detail : `Error ${res.status}`);
+    }
+    const room = MAX_LIB_CHUNKS - libraryChunkCount() + (library.find(d => d.name === data.name)?.chunks.length || 0);
+    if (room <= 0) throw new Error("Library is full. Remove a document first.");
+    library = library.filter(d => d.name !== data.name);          // re-adding replaces
+    library.push({ name: data.name, chars: data.chars, embedded: data.embedded,
+                   truncated: data.truncated || data.chunks.length > room, chunks: data.chunks.slice(0, room) });
+    saveLibrary();
+    pendingDocs.delete(file.name);
+    toast(`Added ${file.name} to your library`);
+  } catch (err) {
+    pendingDocs.set(file.name, err.message);
+    setTimeout(() => { pendingDocs.delete(file.name); renderLibrary(); }, 6000);
+  }
+  renderLibrary();
+}
+
+function openLibrary() {
+  libraryEl.classList.remove("hidden");
+  libraryScrim.classList.remove("hidden");
+  $("library-close").focus();
+}
+function closeLibrary() {
+  libraryEl.classList.add("hidden");
+  libraryScrim.classList.add("hidden");
+  $("library-btn").focus();
+}
+
+$("library-btn").addEventListener("click", openLibrary);
+$("library-close").addEventListener("click", closeLibrary);
+libraryScrim.addEventListener("click", closeLibrary);
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && !libraryEl.classList.contains("hidden")) closeLibrary();
+});
+$("library-add").addEventListener("click", () => libraryInput.click());
+libraryInput.addEventListener("change", () => {
+  [...libraryInput.files].forEach(addToLibrary);
+  libraryInput.value = "";
+});
+libraryList.addEventListener("click", e => {
+  const btn = e.target.closest("button[data-name]");
+  if (!btn) return;
+  library = library.filter(d => d.name !== btn.dataset.name);
+  saveLibrary();
+  renderLibrary();
+});
+
+agentsToggle.checked = load(AGENTS_KEY, true) !== false;
+agentsToggle.addEventListener("change", () => save(AGENTS_KEY, agentsToggle.checked));
+renderLibrary();
 
 // ---------- events ----------
 form.addEventListener("submit", e => {

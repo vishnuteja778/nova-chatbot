@@ -7,6 +7,7 @@ Key idea: a serverless function keeps NO memory between requests (just like
 the model). So the BROWSER keeps the conversation and sends the whole history
 with every message, exactly like messages[] in chatbot.py.
 """
+import asyncio
 import io
 import os
 import secrets
@@ -29,6 +30,8 @@ from pypdf import PdfReader
 load_dotenv()  # local only; on Vercel the variables come from the dashboard
 
 import stock_tools  # noqa: E402  (imported after load_dotenv so it can read TAVILY_API_KEY)
+import agents  # noqa: E402
+import rag  # noqa: E402
 
 # .strip() removes spaces and line breaks that sneak in when values are copied
 # and pasted into a dashboard. A key with a trailing line break can't be sent
@@ -96,8 +99,23 @@ class Message(BaseModel):
     content: str = Field(min_length=1, max_length=MAX_CHARS)
 
 
+class LibraryChunk(BaseModel):
+    section: str = Field(default="Text", max_length=200)
+    text: str = Field(min_length=1, max_length=2_000)
+    vec: str | None = Field(default=None, max_length=600)   # int8 embedding, base64
+
+
+class LibraryDoc(BaseModel):
+    """A user's document, chunked and embedded by /api/library, stored in the
+    browser, and sent back with each chat so the Researcher can search it."""
+    name: str = Field(min_length=1, max_length=255)
+    chunks: list[LibraryChunk] = Field(default_factory=list, max_length=rag.MAX_LIBRARY_CHUNKS)
+
+
 class ChatRequest(BaseModel):
     messages: list[Message] = Field(min_length=1)
+    library: list[LibraryDoc] = Field(default_factory=list, max_length=20)
+    agents: bool = True   # False = the single, faster Nova without the agent team
 
 
 # ---------- Rate limiting ----------
@@ -198,6 +216,8 @@ def health():
         "model": MODEL,
         "bot": BOT_NAME,
         "access_code_required": bool(ACCESS_CODE),
+        "library_chunks": len(rag.library()),
+        "agent_models": {**agents.MODELS, "writer": MODEL},
     }
 
 
@@ -206,6 +226,7 @@ def start_stream(messages: list, tools_allowed: bool):
     try:
         return client.chat.completions.create(
             model=MODEL, messages=messages, temperature=0.5, stream=True,
+            max_tokens=3000,  # counted toward Groq's per-minute limit up front
             tools=stock_tools.TOOLS,
             tool_choice="auto" if tools_allowed else "none",
         )
@@ -237,6 +258,27 @@ def chat(body: ChatRequest, request: Request):
     # Same as chatbot.py: system prompt first, then the (trimmed) history.
     history = [m.model_dump() for m in body.messages][-MAX_MESSAGES:]
     messages = [{"role": "system", "content": system_prompt()}] + history
+
+    # ---- Multi-agent mode: the Planner decides who handles this request ----
+    if body.agents:
+        uploads = rag.uploads_to_chunks([d.model_dump() for d in body.library])
+        run = agents.Run(client, uploads)
+        question = history[-1]["content"] if history[-1]["role"] == "user" else ""
+        try:
+            decision = agents.plan(run, question, history[:-1], [d.name for d in body.library])
+        except agents.Stop as e:
+            raise HTTPException(status_code=429, detail=str(e))
+        except groq.APIError:
+            decision = {"mode": "direct", "tasks": []}  # planner failed: fall back to normal Nova
+        if decision["mode"] == "team":
+            work = lambda: agents.team(run, decision["tasks"], question, history[-7:],
+                                       MODEL, system_prompt())
+            return StreamingResponse(
+                agents.stream_events(run, work),
+                media_type="text/plain; charset=utf-8",
+                headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+            )
+        # "direct": fall through to the single Nova below.
 
     # Start the stream BEFORE returning, so key/rate-limit errors become
     # proper HTTP errors instead of a half-finished reply.
@@ -336,11 +378,11 @@ def chat(body: ChatRequest, request: Request):
 WORD_NS = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 
 
-def read_pdf(data: bytes) -> str:
+def read_pdf(data: bytes, max_pages: int = MAX_PDF_PAGES) -> str:
     reader = PdfReader(io.BytesIO(data))
     if reader.is_encrypted and not reader.decrypt(""):
         raise HTTPException(status_code=422, detail="This PDF is password-protected.")
-    pages = reader.pages[:MAX_PDF_PAGES]
+    pages = reader.pages[:max_pages]
     return "\n\n".join((page.extract_text() or "").strip() for page in pages)
 
 
@@ -400,6 +442,54 @@ async def extract(request: Request, name: str = Query(min_length=1, max_length=2
         "text": text[:MAX_FILE_CHARS],
         "chars": len(text),
         "truncated": len(text) > MAX_FILE_CHARS,
+    }
+
+
+LIBRARY_PDF_PAGES = 300   # a whole annual report
+
+
+@app.post("/api/library")
+async def add_to_library(request: Request, name: str = Query(min_length=1, max_length=255)):
+    """RAG indexing for the user's own document.
+
+    Receives one file's raw bytes, extracts the text, splits it into chunks and
+    embeds each chunk. Returns the chunks; the BROWSER stores them (a serverless
+    function can't keep files) and sends them back with each chat message.
+    """
+    check_access(request, extract_limiter)
+    declared = int(request.headers.get("content-length") or 0)
+    if declared > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="Too big (max 4 MB)")
+    data = await request.body()
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="Too big (max 4 MB)")
+
+    suffix = Path(name).suffix.lower()
+    try:
+        if suffix == ".pdf":
+            text = read_pdf(data, LIBRARY_PDF_PAGES)
+        elif suffix == ".docx":
+            text = read_docx(data)
+        else:
+            if b"\x00" in data[:4096]:
+                raise HTTPException(status_code=415, detail="Not a text, PDF or Word file")
+            text = data.decode("utf-8", errors="replace")
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=422, detail="Couldn't read this file")
+
+    text = text.strip()
+    if not text:
+        raise HTTPException(status_code=422, detail="No text found (scanned PDF?)")
+    # Embedding is CPU work, so it runs off the event loop.
+    chunks = await asyncio.to_thread(rag.index_upload, name, text)
+    return {
+        "name": name,
+        "chars": len(text),
+        "truncated": len(text) > rag.MAX_DOC_CHARS,
+        "embedded": bool(chunks) and chunks[0]["vec"] is not None,
+        "chunks": chunks,
     }
 
 

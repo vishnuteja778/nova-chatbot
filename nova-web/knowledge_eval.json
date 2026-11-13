@@ -1,0 +1,18 @@
+[
+  {"q": "What does it mean when the 50 day average crosses above the 200 day average?", "source": "technical-indicators.md", "section": "Golden cross and death cross"},
+  {"q": "Is a stock with RSI of 75 going to fall?", "source": "technical-indicators.md", "section": "Relative Strength Index (RSI)"},
+  {"q": "Why can a very cheap looking P/E be a trap?", "source": "valuation-ratios.md", "section": "Price-to-earnings (P/E) ratio"},
+  {"q": "Which ratio should I use to value a bank?", "source": "sector-metrics.md", "section": "Banks and NBFCs (for example HDFC Bank, ICICI Bank, SBI, Bajaj Finance)"},
+  {"q": "How do I compare two companies that carry different amounts of borrowing?", "source": "valuation-ratios.md", "section": "EV/EBITDA"},
+  {"q": "What is free cash flow and how is it calculated?", "source": "financial-statements.md", "section": "Cash flow statement"},
+  {"q": "What is a healthy return on equity?", "source": "financial-statements.md", "section": "Key health ratios"},
+  {"q": "What time does the NSE open and close?", "source": "indian-stock-market.md", "section": "Trading hours and settlement"},
+  {"q": "How much tax do I pay on shares I held for two years?", "source": "indian-stock-market.md", "section": "Taxes on listed shares (as announced in the July 2024 Union Budget)"},
+  {"q": "Why did a stock fall even though profits hit a record?", "source": "earnings-and-news.md", "section": "Expectations: beats and misses"},
+  {"q": "What does constant currency growth mean for IT companies?", "source": "sector-metrics.md", "section": "IT services (for example TCS, Infosys, Wipro, HCLTech)"},
+  {"q": "Do most people make money trading futures and options?", "source": "risk-and-investing-basics.md", "section": "Leverage and derivatives"},
+  {"q": "Can anyone really predict short term stock moves?", "source": "risk-and-investing-basics.md", "section": "Why stock prediction is hard"},
+  {"q": "What warning signs should I look for in a company's accounts?", "source": "financial-statements.md", "section": "Red flags in financial statements"},
+  {"q": "Who needs to be registered with SEBI to give stock tips?", "source": "indian-stock-market.md", "section": "The regulator: SEBI"},
+  {"q": "What is NPA in banking?", "source": "sector-metrics.md", "section": "Banks and NBFCs (for example HDFC Bank, ICICI Bank, SBI, Bajaj Finance)"}
+]

@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Nova Agents Learning Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 17mm 18mm 17mm; }
+  :root { --ink:#1d2330; --muted:#5b6474; --accent:#2f5bd3; --soft:#eef2fb; --line:#d9dee8; --good:#1f8a4c; --bad:#c0392b; --warn:#fff6e0; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", system-ui, sans-serif; color: var(--ink); font-size: 10.5pt; line-height: 1.55; margin: 0; background:#fff; }
+  h1 { font-size: 26pt; margin: 0 0 6px; letter-spacing: -0.5px; }
+  h2 { font-size: 16pt; color: var(--accent); border-bottom: 2px solid var(--soft); padding-bottom: 4px; margin: 26px 0 10px; break-after: avoid; }
+  h3 { font-size: 12pt; margin: 18px 0 6px; break-after: avoid; }
+  p { margin: 6px 0 8px; }
+  code { font-family: Consolas, "Cascadia Mono", monospace; font-size: 9.2pt; background: #f3f5f9; padding: 1px 4px; border-radius: 3px; }
+  pre { font-family: Consolas, "Cascadia Mono", monospace; font-size: 8.8pt; line-height: 1.45; background: #f6f8fb; border: 1px solid var(--line); border-left: 3px solid var(--accent); padding: 9px 11px; border-radius: 4px; white-space: pre-wrap; break-inside: avoid; margin: 8px 0 10px; }
+  pre code { background: none; padding: 0; }
+  .c { color: #6a7385; font-style: italic; }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0 12px; font-size: 9.6pt; break-inside: avoid; }
+  th, td { border: 1px solid var(--line); padding: 5px 8px; text-align: left; vertical-align: top; }
+  th { background: var(--soft); }
+  .box { border: 1px solid var(--line); border-radius: 6px; padding: 9px 12px; margin: 10px 0; break-inside: avoid; }
+  .key { background: var(--soft); border-color: #c9d5f3; }
+  .key b:first-child { color: var(--accent); }
+  .warn { background: var(--warn); border-color: #f0d79a; }
+  .lesson { background: #eef8f1; border-color: #bfe3cc; }
+  .cover { height: 245mm; display: flex; flex-direction: column; justify-content: center; break-after: page; }
+  .cover .tag { color: var(--accent); font-weight: 600; letter-spacing: 2px; font-size: 10pt; text-transform: uppercase; }
+  .cover .sub { font-size: 13pt; color: var(--muted); max-width: 140mm; }
+  .toc { columns: 2; font-size: 10pt; margin-top: 24px; }
+  .toc div { margin: 2px 0; }
+  .page { break-before: page; }
+  .muted { color: var(--muted); }
+  .qa dt { font-weight: 600; margin-top: 9px; }
+  .qa dd { margin: 2px 0 0 0; }
+  ul, ol { margin: 4px 0 8px; padding-left: 20px; }
+  li { margin: 2px 0; }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<section class="cover">
+  <div class="tag">AI Engineering Portfolio · Project 3</div>
+  <h1>Nova Agents:<br>tool calling, RAG and a multi-agent team</h1>
+  <p class="sub">How Nova grew from a chatbot into a general-purpose team of AI agents that plan any task, call tools for live data and exact calculations, search documents with RAG, write the answer and review it, all on free APIs.</p>
+  <p class="muted" style="margin-top:28px">Built by Vishnu Teja · nova-web/ · November 2026</p>
+  <div class="toc">
+    <div>1. What you built</div>
+    <div>2. Key ideas in one page</div>
+    <div>3. Tool calling</div>
+    <div>4. What makes it "agentic"</div>
+    <div>5. The multi-agent team</div>
+    <div>6. Why each agent uses a different model</div>
+    <div>7. RAG inside Nova</div>
+    <div>8. Your documents in a serverless app</div>
+    <div>9. Evaluating retrieval</div>
+    <div>10. Streaming the agents to the browser</div>
+    <div>11. Code walkthrough</div>
+    <div>12. Problems we hit (real lessons)</div>
+    <div>13. How to run and experiment</div>
+    <div>14. Limitations and next steps</div>
+    <div>15. Interview questions</div>
+    <div>16. Glossary</div>
+  </div>
+</section>
+
+<!-- ============ 1 ============ -->
+<h2>1. What you built</h2>
+<p>Nova is a chat assistant on the web (FastAPI backend on Vercel, plain HTML/JS frontend). This project added three abilities:</p>
+<table>
+  <tr><th>Ability</th><th>What it means in Nova</th></tr>
+  <tr><td><b>Tool calling</b></td><td>The model can ask the server to run Python functions: an exact calculator, live data lookups (market data today; web search when a key is set) and document search.</td></tr>
+  <tr><td><b>RAG</b></td><td>Nova searches a built-in knowledge library (7 reference documents, 60 chunks) and the user's own uploads on any topic (reports, notes, manuals), and cites the exact passage: <code>[D1]</code>.</td></tr>
+  <tr><td><b>Multi-agent</b></td><td>For any substantial task, a Planner decides who works on it: an Analyst (live data, calculations) and/or a Researcher (documents) in parallel; a Writer produces the answer, report, plan or code; a Reviewer checks it and can force one rewrite.</td></tr>
+</table>
+<p>The team is general-purpose. Some examples of how the Planner routes work:</p>
+<table>
+  <tr><th>Request</th><th>Team</th></tr>
+  <tr><td>"hey, how's it going?"</td><td>Direct: no team needed</td></tr>
+  <tr><td>"Write a function that validates IPv4 addresses"</td><td>Writer + Reviewer (Reviewer checks the code for bugs)</td></tr>
+  <tr><td>"I save 12,000 a month at 7%: how much after 5 years?"</td><td>Analyst (exact calculation) + Writer + Reviewer</td></tr>
+  <tr><td>"From my report: why did margins fall?"</td><td>Researcher (searches your document) + Writer + Reviewer</td></tr>
+  <tr><td>"Compare two companies and explain the key metrics"</td><td>Analyst (live data) + Researcher (library) in parallel + Writer + Reviewer</td></tr>
+</table>
+<div class="box key"><b>One sentence for your CV:</b> Built a general-purpose multi-agent assistant (planner, tool-using analyst and researcher, writer, reviewer) with hybrid-search RAG over a knowledge library and user documents, live-data and calculator tools, and streamed agent traces, running entirely on free-tier APIs.</div>
+
+<!-- ============ 2 ============ -->
+<h2>2. Key ideas in one page</h2>
+<ul>
+  <li><b>An LLM can't do anything by itself.</b> It only produces text. "Tool calling" means the text it produces is a structured request (<code>get_stock_quote(symbol="TCS.NS")</code>) that <i>your code</i> runs.</li>
+  <li><b>An agent is a loop:</b> the model thinks, calls a tool, reads the result, and decides what to do next, until it can answer.</li>
+  <li><b>RAG</b> (Retrieval-Augmented Generation) means: find the relevant passages first, put them in the prompt, then ask the model to answer <i>only from them</i> and cite them. It reduces made-up facts and lets the model use documents it was never trained on.</li>
+  <li><b>Multi-agent</b> means splitting one job between several LLM calls, each with a narrow role, its own instructions and its own tools. Narrow roles are easier for a model to do well.</li>
+  <li><b>Everything costs tokens.</b> On Groq's free tier each model allows about <b>8,000 tokens per minute</b>. Most design decisions in this project come from that budget.</li>
+</ul>
+
+<!-- ============ 3 ============ -->
+<h2 class="page">3. Tool calling</h2>
+<h3>3.1 Describing a tool to the model</h3>
+<p>You send the model a list of tools as JSON Schema: a name, a description (the model reads this to decide <i>when</i> to use it), and the parameters.</p>
+<pre><code>{"type": "function", "function": {
+  "name": "get_stock_quote",
+  "description": "Current price, valuation (P/E, P/B, market cap), 52-week range ...",
+  "parameters": {"type": "object",
+                 "properties": {"symbol": {"type": "string"}},
+                 "required": ["symbol"]}}}</code></pre>
+<h3>3.2 The loop</h3>
+<pre><code><span class="c"># simplified from agents.run_specialist</span>
+messages = [system, user_question]
+for round in range(MAX_ROUNDS):
+    reply = groq.chat.completions.create(model, messages, tools=TOOLS)
+    if not reply.tool_calls:               <span class="c"># plain answer: done</span>
+        return reply.content
+    messages.append(reply)                 <span class="c"># remember what it asked for</span>
+    for call in reply.tool_calls:          <span class="c"># run each tool in Python</span>
+        result = run_tool(call.name, call.arguments)
+        messages.append({"role": "tool", "tool_call_id": call.id, "content": result})</code></pre>
+<p>The model never touches the internet. It only asks; your code decides whether and how to run the request. That's also a security boundary: <code>stock_tools.py</code> validates every ticker with a regular expression before it reaches Yahoo Finance, and tool errors go back to the model as <code>{"error": ...}</code> so it can correct itself (for example, look up the right ticker and retry).</p>
+<h3>3.3 Designing good tools</h3>
+<ul>
+  <li><b>Return compact JSON.</b> Every character you return is read by the model and counts against the token budget. The tools drop empty fields and trim long text.</li>
+  <li><b>Combine tools that are always used together.</b> <code>analyze_stock</code> returns quote + trend + financials + news in one call. Before it existed, a full analysis took 5 rounds (each resending the whole conversation) and blew the 8,000-token budget; now it takes 2.</li>
+  <li><b>Write descriptions for the model, not for humans.</b> "Use this whenever you are not sure of the exact symbol" changes behaviour.</li>
+</ul>
+
+<!-- ============ 4 ============ -->
+<h2>4. What makes it "agentic"</h2>
+<p>There is a spectrum, and it helps to name the levels:</p>
+<table>
+  <tr><th>Level</th><th>Who decides the steps?</th><th>In Nova</th></tr>
+  <tr><td>Chatbot</td><td>Nobody: one call, one answer</td><td>The original <code>chatbot.py</code></td></tr>
+  <tr><td>Tool-using agent</td><td>The model, inside a loop</td><td>Nova with the Agent team switched off</td></tr>
+  <tr><td>Workflow</td><td>Your code: fixed steps</td><td>Specialists → Writer → Reviewer order is fixed</td></tr>
+  <tr><td>Multi-agent</td><td>A planner model routes work to other agents</td><td>The Planner chooses direct vs research and which specialists to use</td></tr>
+</table>
+<div class="box key"><b>Design principle:</b> give the model freedom where it adds value (which tools, which searches, which specialists) and keep fixed code where reliability matters (always Reviewer after Writer, a hard time budget, at most one revision). Fully free-form agents are impressive in demos but hard to debug and expensive.</div>
+
+<!-- ============ 5 ============ -->
+<h2 class="page">5. The multi-agent team</h2>
+<pre><code>request
+   │
+PLANNER (qwen3.8-27b, JSON)  ── "direct" ──►  normal single Nova (quick replies)
+   │ "team" + 0, 1 or 2 tasks
+   ▼
+ANALYST (gpt-oss-120b)            RESEARCHER (qwen3.8-27b)     ◄ in parallel,
+ calculator, live data, web        search_documents (RAG), web    only if needed
+   └───────────────── notes ────────────────┘
+                      ▼
+               WRITER (gpt-oss-20b) ──► draft, streamed to the user
+                      ▼
+               REVIEWER (gpt-oss-120b, JSON) ──► approve | revise + issues
+                      ▼ only if "revise"
+               WRITER ──► revised answer replaces the draft</code></pre>
+<table>
+  <tr><th>Agent</th><th>Input</th><th>Output</th><th>Why it exists</th></tr>
+  <tr><td>Planner</td><td>Latest message, recent chat, names of uploaded docs</td><td>JSON: mode + tasks</td><td>Quick replies skip the team; substantial tasks get exactly the specialists they need</td></tr>
+  <tr><td>Analyst</td><td>A task like "compute the savings after 5 years" or "fetch data for INFY.NS"</td><td>≤180-word notes; fetched data tagged <code>[Live data]</code></td><td>Exact numbers from tools instead of the model's mental maths</td></tr>
+  <tr><td>Researcher</td><td>A task like "find why margins fell in the user's report"</td><td>≤180-word notes tagged <code>[D#]</code></td><td>Grounds answers in documents instead of model memory</td></tr>
+  <tr><td>Writer</td><td>Task + any notes</td><td>The answer: explanation, report, plan or code</td><td>One voice, consistent structure, no tool noise</td></tr>
+  <tr><td>Reviewer</td><td>Task + notes + draft</td><td>JSON verdict and issues</td><td>Catches factual and calculation errors, code bugs, unanswered parts, unsupported claims</td></tr>
+</table>
+<h3>The Analyst's safe calculator</h3>
+<p>LLMs are unreliable at arithmetic, so the Analyst has a <code>calculate</code> tool. The obvious implementation, <code>eval(expression)</code>, would be a serious security hole: the expression is written by a model that may have read text from a user or a web page, and <code>eval</code> runs <i>any</i> Python, e.g. <code>__import__("os").system(...)</code>. Instead, <code>agents.calculate</code> parses the expression into a syntax tree with <code>ast.parse</code> and evaluates only numbers, arithmetic operators and a whitelist of maths functions; anything else is rejected, and huge exponents are blocked.</p>
+<pre><code>calculate("12000 * ((1 + 0.07/12)**60 - 1) / (0.07/12)")   <span class="c"># → {"result": 859114.819777}</span>
+calculate('__import__("os")')                              <span class="c"># → {"error": "only numbers, + - * / ..."}</span></code></pre>
+<h3>Why "notes" instead of raw tool output?</h3>
+<p>Specialists summarise what they found into short notes. The Writer reads ~400 words of notes instead of thousands of characters of JSON. This is <b>context compression</b>, and it's why a five-agent run fits in the free tier.</p>
+<h3>Structured outputs</h3>
+<p>The Planner and Reviewer must answer in JSON (<code>response_format={"type": "json_object"}</code>) so code can read their decisions. Code then <i>validates</i> them: unknown agents are dropped, a "revise" verdict without issues is treated as "approve", and any failure falls back to safe behaviour (the Planner falls back to normal Nova; a failed Reviewer just skips the review).</p>
+
+<!-- ============ 6 ============ -->
+<h2>6. Why each agent uses a different model</h2>
+<p>Groq's free tier gives <b>each model its own</b> 8,000 tokens-per-minute budget. A team run uses roughly 10,000–15,000 tokens in total, which is too much for one model in one minute. Spread across three models it fits:</p>
+<table>
+  <tr><th>Model</th><th>Agents</th><th>Strength</th></tr>
+  <tr><td><code>qwen/qwen3.8-27b</code></td><td>Planner, Researcher</td><td>Fast, good at JSON and short tool loops</td></tr>
+  <tr><td><code>openai/gpt-oss-120b</code></td><td>Analyst, Reviewer</td><td>Strongest reasoning: numbers and fact-checking</td></tr>
+  <tr><td><code>openai/gpt-oss-20b</code></td><td>Writer (and normal Nova)</td><td>Fast streaming prose</td></tr>
+</table>
+<p>The models are set in <code>agents.MODELS</code> and can be changed with environment variables (<code>PLANNER_MODEL</code>, <code>ANALYST_MODEL</code>, <code>RESEARCHER_MODEL</code>, <code>REVIEWER_MODEL</code>).</p>
+<div class="box warn"><b>Watch out:</b> Groq counts <code>max_tokens</code> against the per-minute budget <i>before</i> running the call. Every agent therefore sets an explicit, small <code>max_tokens</code> (see section 12).</div>
+
+<!-- ============ 7 ============ -->
+<h2 class="page">7. RAG inside Nova</h2>
+<p>Nova's RAG (<code>nova-web/rag.py</code>) is a web-friendly version of your Ask My Docs project (<code>rag/</code>). The concepts are the same; read the RAG learning guide for the deep dive.</p>
+<pre><code>INDEXING                                   SEARCHING (each search_documents call)
+knowledge/*.md ─┐                          query ──► BM25 ranking   ─┐
+user uploads  ──┴► chunks (800 chars,              ──► vector ranking ─┴► RRF ─► top 4 passages
+                   150 overlap, section header)                          numbered D1, D2...
+                ──► BGE-small embeddings (384 numbers)
+                ──► int8 + base64 (1 byte per number)</code></pre>
+<h3>7.1 The built-in knowledge library</h3>
+<p><code>nova-web/knowledge/</code> holds 7 Markdown documents: valuation ratios, technical indicators, financial statements, the Indian market (NSE/BSE, SEBI, trading hours, taxes), earnings and news, risk basics, and sector metrics. <code>python build_index.py</code> chunks and embeds them into <code>knowledge_index.json</code> (60 chunks, 58 KB), which is committed. The deployed app only loads that file; it never re-embeds the library.</p>
+<h3>7.2 Hybrid search with Reciprocal Rank Fusion</h3>
+<p>BM25 matches exact words (great for "NPA", "SEBI", tickers); vectors match meaning ("borrowing" ≈ "debt"). Their scores are on different scales, so RRF ignores the scores and adds <code>1 / (60 + rank)</code> from each list. A passage ranked well by both wins.</p>
+<h3>7.3 Quantisation: int8 vectors</h3>
+<p>An embedding is 384 floats (4 bytes each = 1,536 bytes). Because BGE vectors are normalised, every number is between −1 and 1, so we store <code>round(x × 127)</code> as one signed byte: 384 bytes, 4× smaller, with almost no loss in search quality. Vector databases use the same trick.</p>
+<pre><code>def pack_vec(vec):
+    q = np.clip(np.round(vec * 127), -127, 127).astype(np.int8)
+    return base64.b64encode(q.tobytes()).decode("ascii")</code></pre>
+<h3>7.4 Graceful degradation</h3>
+<p>Embeddings run locally with <code>fastembed</code> (free, no API key). If the model can't load (no disk space, package missing, <code>NOVA_EMBEDDINGS=off</code>), <code>rag.embedder()</code> returns <code>None</code> and search silently becomes BM25-only. Nova gets a bit less smart but never breaks.</p>
+<h3>7.5 Citations end to end</h3>
+<p>Each search result gets a stable ref (<code>D1</code>, <code>D2</code>...) stored in the run, so the same passage keeps the same number across searches. The Writer cites refs; after the answer, code appends a <b>Sources</b> list containing only the refs the answer actually used, with file, section and whether it came from the library or the user's document.</p>
+
+<!-- ============ 8 ============ -->
+<h2>8. Your documents in a serverless app</h2>
+<p>A Vercel function has <b>no permanent disk</b>: it can be shut down at any moment, and the next request may run on a different machine. So where do uploaded documents live?</p>
+<ol>
+  <li>The browser sends the file to <code>POST /api/library</code>.</li>
+  <li>The server extracts text (PDF up to 300 pages, Word, text), chunks it, embeds each chunk, and returns the chunks with their int8 vectors.</li>
+  <li>The <b>browser</b> stores them in <code>localStorage</code> (key <code>nova-library-v1</code>), max 20 documents / 400 chunks.</li>
+  <li>Every chat request includes the library; the Researcher's <code>search_documents</code> tool searches it together with the built-in library.</li>
+</ol>
+<p>Trade-offs: requests get bigger (a full library is a few hundred KB, well under Vercel's 4.5 MB limit), and the library lives in one browser. A production system would use a vector database (pgvector, Qdrant, Upstash Vector) keyed by user account.</p>
+<p>Long attachments are added automatically: a file longer than 15,000 characters used to be cut off; now the first part goes into the message and the <i>whole</i> document goes into the library, where the Researcher can search all of it.</p>
+
+<!-- ============ 9 ============ -->
+<h2 class="page">9. Evaluating retrieval</h2>
+<p><code>python eval_rag.py</code> runs 16 hand-written questions (<code>knowledge_eval.json</code>), each labelled with the section that answers it. <b>Hit@4</b> = how often that section is in the top 4 (what the agent actually reads). <b>MRR</b> = average of 1/rank of the first correct result.</p>
+<table>
+  <tr><th>Method</th><th>Hit@4</th><th>MRR</th></tr>
+  <tr><td>BM25 only</td><td>88%</td><td>0.73</td></tr>
+  <tr><td>Vector only</td><td>88%</td><td>0.81</td></tr>
+  <tr><td><b>Hybrid (RRF)</b></td><td><b>94%</b></td><td>0.77</td></tr>
+</table>
+<p>BM25 missed "golden cross" phrased as "50 day average crosses above the 200 day average" (different words), and vector search missed "comparing companies with different amounts of borrowing" (it found debt ratios instead of EV/EBITDA). Each method fails on different questions, so combining them catches more. The remaining miss ("warning signs in a company's accounts" vs the section titled "Red flags") is a vocabulary gap that a reranker or query rewriting could fix.</p>
+<div class="box warn">16 self-written questions is a <b>regression check</b>, not a benchmark. Its value is telling you whether a change (chunk size, model, new documents) made things better or worse.</div>
+
+<!-- ============ 10 ============ -->
+<h2>10. Streaming the agents to the browser</h2>
+<p>Everything travels in one plain-text HTTP stream. Three control characters, which never appear in normal text, carry the agent trace:</p>
+<table>
+  <tr><th>Marker</th><th>Meaning</th><th>Browser does</th></tr>
+  <tr><td><code>\x02label\x03</code></td><td>Status: "Researcher → searching documents: NPA"</td><td>Adds a chip above the reply</td></tr>
+  <tr><td><code>\x04</code></td><td>The Reviewer requested a revision</td><td>Clears the draft; the revised answer streams in its place</td></tr>
+  <tr><td>anything else</td><td>Answer text</td><td>Renders it as Markdown</td></tr>
+</table>
+<p>Specialists run in background threads and push events into a <code>queue.Queue</code>; the HTTP generator reads the queue and yields text. That's how parallel agents can report progress through a single stream.</p>
+
+<!-- ============ 11 ============ -->
+<h2 class="page">11. Code walkthrough</h2>
+<table>
+  <tr><th>File</th><th>What it does</th></tr>
+  <tr><td><code>app.py</code></td><td>FastAPI routes. <code>/api/chat</code> asks the Planner first; "team" goes to the agent team, "direct" to the single tool-calling loop. <code>/api/library</code> indexes uploads. Rate limiting and access code.</td></tr>
+  <tr><td><code>agents.py</code></td><td>The team: <code>Run</code> (shared state, rate-limit handling, the RAG tool), <code>plan()</code>, <code>run_specialist()</code>, <code>stream_writer()</code>, <code>critique()</code>, <code>research()</code>, <code>stream_events()</code>.</td></tr>
+  <tr><td><code>stock_tools.py</code></td><td>Market tools on Yahoo Finance: <code>search_symbol</code>, <code>analyze_stock</code>, quote, history and technicals, financials, news, optional <code>web_search</code>.</td></tr>
+  <tr><td><code>rag.py</code></td><td>Chunking, BM25, embeddings, int8 packing, library loading, upload indexing, hybrid search.</td></tr>
+  <tr><td><code>build_index.py</code></td><td>Builds <code>knowledge_index.json</code> from <code>knowledge/</code>.</td></tr>
+  <tr><td><code>eval_rag.py</code></td><td>Hit@4 and MRR per search method.</td></tr>
+  <tr><td><code>static/app.js</code></td><td>Chat UI: stream parsing (chips, reset), the Library panel, Agent team switch, auto-indexing long attachments.</td></tr>
+</table>
+<h3>The heart of the pipeline (agents.research, simplified)</h3>
+<pre><code>with ThreadPoolExecutor() as pool:                       <span class="c"># 1. specialists in parallel</span>
+    futures = {t["agent"]: pool.submit(run_specialist, run, t["agent"], t["task"])
+               for t in tasks}
+findings = {a: f.result() for a, f in futures.items()}
+
+notes = notes_block(question, findings)
+draft = stream_writer(run, writer_model, system, history, notes)   <span class="c"># 2. draft, streamed</span>
+
+review = critique(run, notes, draft)                     <span class="c"># 3. check</span>
+if review["verdict"] == "revise" and run.time_left() > 12:
+    run.events.put(("reset", None))                      <span class="c"># 4. replace the draft</span>
+    stream_writer(run, ..., notes + draft + review["issues"])</code></pre>
+<h3>Safety rails in code (not in prompts)</h3>
+<ul>
+  <li><b>Time budget:</b> 48 seconds per run (Vercel stops at 60). The Reviewer and revision are skipped if time is short; specialists stop calling tools when under 24 s remain.</li>
+  <li><b>At most 4 tool rounds</b> per specialist, one revision per answer.</li>
+  <li><b>Rate limits:</b> waits up to 20 s once, then tells the user to try again.</li>
+  <li><b>Input limits:</b> the library and messages are validated by Pydantic models (sizes, counts).</li>
+</ul>
+
+<!-- ============ 12 ============ -->
+<h2 class="page">12. Problems we hit (real engineering lessons)</h2>
+<div class="box lesson"><b>1. Empty replies after tool calls.</b> gpt-oss models reason privately before calling a tool. We dropped that reasoning when sending the tool results back, so the model lost its train of thought and ended its turn with no text. <b>Fix:</b> send the reasoning back with the assistant's tool-call message. <i>Lesson: read the model provider's docs on multi-turn tool use; models differ.</i></div>
+<div class="box lesson"><b>2. Calls refused instantly with "rate limit".</b> No tokens had been used, yet qwen calls failed in 0.2 s. Groq counts <code>prompt + max_tokens</code> against the per-minute budget <i>before</i> running a call, and qwen's default max_tokens alone exceeded 8,000. <b>Fix:</b> explicit <code>MAX_TOKENS</code> per agent. <i>Lesson: when an error appears instantly, it's a policy check, not a workload problem. Print the provider's real error message.</i></div>
+<div class="box lesson"><b>3. The Reviewer's JSON failed to validate.</b> gpt-oss-120b spent its whole 600-token allowance on hidden reasoning and never wrote the JSON. <b>Fix:</b> <code>reasoning_effort="low"</code> for the Planner and Reviewer and a larger allowance. Also: a failed Reviewer now just skips the review instead of crashing the answer. <i>Lesson: reasoning tokens count toward max_tokens; and optional steps must fail safely.</i></div>
+<div class="box lesson"><b>4. Wrong citation formats.</b> The Writer wrote <code>【D1】</code> (full-width brackets) and sometimes hid zero-width spaces inside citations, so the Sources list missed them. <b>Fix:</b> normalise the stream in code. <i>Lesson: never rely on a model's exact formatting; normalise and validate.</i></div>
+<div class="box lesson"><b>5. Market data cited as D1.</b> Both specialists were told "cite passages as [D1]", so the Analyst numbered its own data and the Writer mixed them up. <b>Fix:</b> a separate notes format per agent, with <code>[Live data]</code> for one and <code>[D#]</code> only for document passages. <i>Lesson: in multi-agent systems, shared instructions leak into the wrong roles. Give each agent only the rules it needs.</i></div>
+<div class="box lesson"><b>6. A crashed specialist threw away its data.</b> On the Analyst's last round we sent <code>tool_choice="none"</code>, but the model called a tool anyway and Groq rejected the request, so all the bank data it had fetched was lost and the answer said "no market data". The run also took 72 s, past Vercel's 60 s limit, because the analyst fetched one tool per round. <b>Fix:</b> the final round sends a plain "write your notes now" message with no tools offered; if that fails, the raw results become the notes. Specialists stop gathering when 24 s remain, every Groq call has a 20 s timeout, and the analyst is told to call <code>analyze_stock</code> for all companies in one parallel turn. <i>Lesson: design every step so a failure degrades the answer instead of destroying work already done.</i></div>
+<div class="box lesson"><b>7. An over-eager agent and a leaking rule.</b> After the team became general-purpose, two things went wrong. For "Analyse TCS" the Researcher searched the library 7 times for company news it doesn't contain, taking 37 s and leaving no time for the Reviewer. And a savings-plan answer ended with the <i>stock</i> disclaimer. <b>Fix:</b> tell the Researcher what the library does and doesn't hold, tell the Planner which agent owns company data, cap the Researcher at 2 search rounds <i>in code</i>, and limit the stock rules to actual stock analyses. <i>Lesson: agents keep trying when they can't find something; give them a stopping rule and a hard limit. And scope every special-case instruction narrowly, or it spreads to unrelated tasks.</i></div>
+<div class="box lesson"><b>8. Free-tier budget shapes the architecture.</b> One model with five tool rounds ran out of tokens. Combining tools (<code>analyze_stock</code>), compressing results into notes, and spreading agents across models with separate budgets made it fit. <i>Lesson: cost and rate limits are design inputs, not afterthoughts.</i></div>
+
+<!-- ============ 13 ============ -->
+<h2>13. How to run and experiment</h2>
+<pre><code>cd nova-web
+.venv\Scripts\activate
+pip install -r requirements.txt
+python build_index.py          <span class="c"># after editing knowledge/</span>
+python eval_rag.py --verbose   <span class="c"># retrieval quality</span>
+uvicorn app:app --reload       <span class="c"># http://localhost:8000</span></code></pre>
+<p>Things to try:</p>
+<ul>
+  <li>Ask "What is a good ROE?" (Researcher only), "Analyse TCS" (both specialists), "hi" (direct).</li>
+  <li>Upload a company's annual report in the Library, then ask about its risks.</li>
+  <li>Switch off <b>Agent team</b> in the Library panel and compare speed and quality.</li>
+  <li>Add a document to <code>knowledge/</code>, rebuild, add 3 eval questions, re-run <code>eval_rag.py</code>.</li>
+  <li>Swap a model with an environment variable (e.g. <code>REVIEWER_MODEL=qwen/qwen3.8-27b</code>) and see how answers change.</li>
+</ul>
+
+<!-- ============ 14 ============ -->
+<h2>14. Limitations and next steps</h2>
+<ul>
+  <li><b>No reranker on the web.</b> The cross-encoder from <code>rag/</code> would improve accuracy but adds another ~80 MB model. Next step: add it locally or use an LLM to rerank the top 10.</li>
+  <li><b>Library lives in one browser.</b> Next: user accounts plus a vector database.</li>
+  <li><b>Free-tier ceiling:</b> about one team task per minute. A paid tier or caching repeated lookups would raise it.</li>
+  <li><b>No answer-quality evaluation yet.</b> Retrieval is measured, but final answers aren't. Next: a small set of questions scored by an LLM judge for faithfulness to the notes.</li>
+  <li><b>Predictions remain uncertain.</b> The outlook is a structured opinion with Low/Medium confidence, not a forecast. This is research, not financial advice.</li>
+</ul>
+
+<!-- ============ 15 ============ -->
+<h2 class="page">15. Interview questions (with answers)</h2>
+<dl class="qa">
+  <dt>What is tool calling and who executes the tool?</dt>
+  <dd>The model outputs a structured request (name + JSON arguments) matching a schema you provided. Your application validates and runs it, then sends the result back as a "tool" message. The model never executes anything itself.</dd>
+  <dt>When would you use multiple agents instead of one?</dt>
+  <dd>When sub-tasks need different instructions, tools or models, can run in parallel, or benefit from independent checking (a reviewer). The costs are more tokens, more latency and harder debugging, so cheap questions should skip the team, which is what Nova's Planner does.</dd>
+  <dt>How do you stop agents looping forever or running up costs?</dt>
+  <dd>Hard limits in code: max tool rounds, one revision, a wall-clock budget, explicit max_tokens, and a planner that routes simple questions to a single call.</dd>
+  <dt>How does your RAG reduce hallucinations?</dt>
+  <dd>Specialists report only what tools and passages returned, the Writer must cite every claim, and a Reviewer checks the draft against the notes and can force a rewrite.</dd>
+  <dt>Why hybrid search?</dt>
+  <dd>BM25 catches exact terms and codes; embeddings catch paraphrases. In our evaluation each alone reached 88% Hit@4 and hybrid reached 94%, because they fail on different questions.</dd>
+  <dt>How did you handle user documents on a serverless platform?</dt>
+  <dd>The server indexes and returns int8-quantised chunks; the browser stores them and sends them with each request. Stateless server, no database, at the cost of larger requests. In production I'd use a vector DB per user.</dd>
+  <dt>Tell me about a hard bug.</dt>
+  <dd>Instant 429 errors with no usage: Groq reserves max_tokens against the per-minute budget up front, and one model's default was larger than the budget. Logging the provider's real message found it; explicit per-agent max_tokens fixed it.</dd>
+</dl>
+
+<!-- ============ 16 ============ -->
+<h2>16. Glossary</h2>
+<table>
+  <tr><th>Term</th><th>Meaning</th></tr>
+  <tr><td>Agent</td><td>An LLM in a loop that can call tools and decide its next step</td></tr>
+  <tr><td>Orchestrator / Planner</td><td>The agent that decides which other agents handle a task</td></tr>
+  <tr><td>Tool / function calling</td><td>The model requests a named function with JSON arguments; your code runs it</td></tr>
+  <tr><td>Structured output / JSON mode</td><td>Forcing the model to reply in valid JSON so code can read it</td></tr>
+  <tr><td>RAG</td><td>Retrieve relevant passages, put them in the prompt, answer from them with citations</td></tr>
+  <tr><td>Chunk</td><td>A piece of a document (here up to 800 characters) that is searched as a unit</td></tr>
+  <tr><td>Embedding</td><td>A list of numbers representing meaning; similar meanings have similar vectors</td></tr>
+  <tr><td>BM25</td><td>Classic keyword ranking formula used by search engines</td></tr>
+  <tr><td>RRF</td><td>Reciprocal Rank Fusion: merges rankings using 1/(60 + rank)</td></tr>
+  <tr><td>Quantisation</td><td>Storing numbers with fewer bits (float32 → int8) to save space</td></tr>
+  <tr><td>Hit@k / MRR</td><td>Retrieval metrics: correct passage in top k / average 1/rank</td></tr>
+  <tr><td>TPM</td><td>Tokens per minute, the main free-tier rate limit</td></tr>
+  <tr><td>Reasoning tokens</td><td>Hidden "thinking" some models do before answering; they count toward max_tokens</td></tr>
+  <tr><td>Context compression</td><td>Summarising tool results into short notes before passing them to the next agent</td></tr>
+</table>
+
+</body>
+</html>
