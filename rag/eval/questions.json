@@ -1,0 +1,20 @@
+[
+  {"question": "How many days of annual leave do I get?", "source": "leave-policy.md", "expected": "24 days"},
+  {"question": "What happens to my unused vacation days at the end of the year?", "source": "leave-policy.md", "expected": "maximum of 5 days"},
+  {"question": "Do I need a medical certificate when I'm ill?", "source": "leave-policy.md", "expected": "3 consecutive days"},
+  {"question": "How much paid time off does a new mother get?", "source": "leave-policy.md", "expected": "26 weeks"},
+  {"question": "Can I take a long break after working here for several years?", "source": "leave-policy.md", "expected": "4-week paid sabbatical"},
+  {"question": "What is expense code EXP-44 used for?", "source": "expenses-and-travel.md", "expected": "EXP-44 for client entertainment"},
+  {"question": "Which website or tool do I use to book a business trip?", "source": "expenses-and-travel.md", "expected": "TripNest"},
+  {"question": "Am I allowed to fly business class?", "source": "expenses-and-travel.md", "expected": "longer than 6 hours"},
+  {"question": "When will my expense refund arrive?", "source": "expenses-and-travel.md", "expected": "28th"},
+  {"question": "How much is the food budget per day on a trip abroad?", "source": "expenses-and-travel.md", "expected": "USD 60"},
+  {"question": "How long must my password be?", "source": "it-security.md", "expected": "14 characters"},
+  {"question": "I left my laptop on the train, what should I do?", "source": "it-security.md", "expected": "within 1 hour"},
+  {"question": "Do I need OrbitConnect when working from a coffee shop?", "source": "it-security.md", "expected": "OrbitConnect"},
+  {"question": "Can I copy files with a pen drive?", "source": "it-security.md", "expected": "USB storage drives are blocked"},
+  {"question": "Which days do I have to come into the office?", "source": "office-and-culture.md", "expected": "Tuesday and Thursday"},
+  {"question": "Am I allowed to bring my puppy to work?", "source": "office-and-culture.md", "expected": "Fridays"},
+  {"question": "How much money do I get for courses and training?", "source": "office-and-culture.md", "expected": "Rs 40,000"},
+  {"question": "When is the company-wide meeting held?", "source": "office-and-culture.md", "expected": "first Monday"}
+]

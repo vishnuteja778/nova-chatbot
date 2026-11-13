@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RAG Learning Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 17mm 18mm 17mm; }
+  :root { --ink:#1d2330; --muted:#5b6474; --accent:#2f5bd3; --soft:#eef2fb; --line:#d9dee8; --good:#1f8a4c; --bad:#c0392b; --warn:#fff6e0; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", system-ui, sans-serif; color: var(--ink); font-size: 10.5pt; line-height: 1.55; margin: 0; background:#fff; }
+  h1 { font-size: 26pt; margin: 0 0 6px; letter-spacing: -0.5px; }
+  h2 { font-size: 16pt; color: var(--accent); border-bottom: 2px solid var(--soft); padding-bottom: 4px; margin: 26px 0 10px; break-after: avoid; }
+  h3 { font-size: 12pt; margin: 18px 0 6px; break-after: avoid; }
+  p { margin: 6px 0 8px; }
+  code { font-family: Consolas, "Cascadia Mono", monospace; font-size: 9.2pt; background: #f3f5f9; padding: 1px 4px; border-radius: 3px; }
+  pre { font-family: Consolas, "Cascadia Mono", monospace; font-size: 8.8pt; line-height: 1.45; background: #f6f8fb; border: 1px solid var(--line); border-left: 3px solid var(--accent); padding: 9px 11px; border-radius: 4px; white-space: pre-wrap; break-inside: avoid; margin: 8px 0 10px; }
+  pre code { background: none; padding: 0; }
+  .c { color: #6a7385; font-style: italic; }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0 12px; font-size: 9.6pt; break-inside: avoid; }
+  th, td { border: 1px solid var(--line); padding: 5px 8px; text-align: left; vertical-align: top; }
+  th { background: var(--soft); }
+  .box { border: 1px solid var(--line); border-radius: 6px; padding: 9px 12px; margin: 10px 0; break-inside: avoid; }
+  .key { background: var(--soft); border-color: #c9d5f3; }
+  .key b:first-child { color: var(--accent); }
+  .warn { background: var(--warn); border-color: #f0d79a; }
+  .lesson { background: #eef8f1; border-color: #bfe3cc; }
+  .cover { height: 245mm; display: flex; flex-direction: column; justify-content: center; break-after: page; }
+  .cover .tag { color: var(--accent); font-weight: 600; letter-spacing: 2px; font-size: 10pt; text-transform: uppercase; }
+  .cover .sub { font-size: 13pt; color: var(--muted); max-width: 140mm; }
+  .toc { columns: 2; font-size: 10pt; margin-top: 24px; }
+  .toc div { margin: 2px 0; }
+  .page { break-before: page; }
+  .muted { color: var(--muted); }
+  figure { margin: 10px 0 12px; break-inside: avoid; text-align: center; }
+  figcaption { font-size: 9pt; color: var(--muted); margin-top: 4px; }
+  .qa dt { font-weight: 600; margin-top: 9px; }
+  .qa dd { margin: 2px 0 0 0; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  ul, ol { margin: 4px 0 8px; padding-left: 20px; }
+  li { margin: 2px 0; }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<section class="cover">
+  <div class="tag">AI Engineering Portfolio · Project 2</div>
+  <h1>Ask My Docs:<br>a RAG learning guide</h1>
+  <p class="sub">Retrieval-Augmented Generation from scratch: chunking, embeddings, BM25, hybrid search, reranking, cited answers and evaluation. Every concept explained, every file walked through.</p>
+  <p class="muted" style="margin-top:14px">Code: <code>rag/</code> in the ai-engineering repo · Written November 2026</p>
+  <div class="toc">
+    <div>1. What you built</div>
+    <div>2. Why RAG exists</div>
+    <div>3. The big picture</div>
+    <div>4. Chunking</div>
+    <div>5. Embeddings &amp; vector search</div>
+    <div>6. BM25 keyword search</div>
+    <div>7. Hybrid search &amp; RRF</div>
+    <div>8. Reranking</div>
+    <div>9. Prompting for cited answers</div>
+    <div>10. Evaluation</div>
+    <div>11. Code walkthrough</div>
+    <div>12. How to run &amp; experiment</div>
+    <div>13. Problems we hit (real lessons)</div>
+    <div>14. Limitations &amp; next steps</div>
+    <div>15. Interview questions</div>
+    <div>16. Glossary &amp; cheat sheet</div>
+  </div>
+</section>
+
+<!-- ============ 1 ============ -->
+<h2>1. What you built</h2>
+<p>A command-line app that answers questions about a folder of documents. For every question it finds the most relevant passages, gives them to an LLM, and returns an answer where every fact is tagged with a citation like <code>[1]</code> pointing to the file and section it came from. If the documents don't contain the answer, it says <i>"I couldn't find that in the documents."</i></p>
+<pre>python ask.py "I left my laptop in a cab, and how long must my password be?"
+
+- Report the lost laptop to the security team within 1 hour by calling the
+  IT helpdesk on extension 4040 so they can lock and wipe it remotely. [2]
+- Your Orbit password must be at least 14 characters long. [1]
+
+Sources:
+  [1] it-security.md > Passwords and sign-in
+  [2] it-security.md > Lost or stolen devices</pre>
+<p>The demo data is a fictional company handbook (Orbit Coffee Co.) with four documents. You can drop your own <code>.md</code>, <code>.txt</code> or <code>.pdf</code> files into <code>rag/data/</code>.</p>
+<div class="box key"><b>What this project proves to an employer.</b> You understand the full retrieval pipeline (not just "call LangChain"), you know <i>why</i> hybrid search and reranking exist, and you <b>measure</b> quality with an evaluation set instead of guessing. You also hit a real failure, diagnosed it with numbers, and fixed it.</div>
+
+<!-- ============ 2 ============ -->
+<h2>2. Why RAG exists</h2>
+<p>An LLM only knows what was in its training data. That causes four problems for real applications:</p>
+<table>
+<tr><th>Problem</th><th>Example</th><th>How RAG helps</th></tr>
+<tr><td><b>Private data</b></td><td>It has never seen your company's leave policy.</td><td>We hand it the relevant policy text at question time.</td></tr>
+<tr><td><b>Out of date</b></td><td>Training stopped months ago; the policy changed last week.</td><td>Re-index the files; no retraining needed.</td></tr>
+<tr><td><b>Hallucination</b></td><td>Asked about something it doesn't know, it invents a plausible answer.</td><td>"Answer only from these sources" + citations the user can check.</td></tr>
+<tr><td><b>Context cost</b></td><td>You can't paste 10,000 pages into every prompt.</td><td>Send only the 4 most relevant chunks (~800 tokens).</td></tr>
+</table>
+<p><b>Retrieval-Augmented Generation</b> = <b>Retrieve</b> relevant text → <b>Augment</b> the prompt with it → let the model <b>Generate</b> the answer. The model becomes a <i>reader</i> of your documents rather than a memory of the internet.</p>
+<div class="box"><b>RAG vs fine-tuning (common interview question).</b> Fine-tuning changes the model's weights. It's good for teaching a <i>style</i> or <i>format</i>, but bad for facts: it's expensive to update, can't cite sources, and still hallucinates. RAG is the default choice for "answer questions about our documents".</div>
+
+<!-- ============ 3 ============ -->
+<h2>3. The big picture</h2>
+<p>A RAG system has two phases. <b>Indexing</b> runs once (and again whenever documents change). <b>Answering</b> runs for every question.</p>
+<figure>
+<svg viewBox="0 0 700 300" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, sans-serif" font-size="12">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5b6474"/></marker></defs>
+  <text x="10" y="18" font-weight="700" fill="#2f5bd3">INDEXING: ingest.py (offline)</text>
+  <g fill="#eef2fb" stroke="#9fb3e6">
+    <rect x="10" y="30" width="120" height="44" rx="6"/><rect x="175" y="30" width="120" height="44" rx="6"/>
+    <rect x="340" y="30" width="150" height="44" rx="6"/><rect x="535" y="30" width="155" height="44" rx="6"/>
+  </g>
+  <g text-anchor="middle" fill="#1d2330">
+    <text x="70" y="50">data/ files</text><text x="70" y="65" font-size="10" fill="#5b6474">.md .txt .pdf</text>
+    <text x="235" y="50">Chunks</text><text x="235" y="65" font-size="10" fill="#5b6474">documents.py</text>
+    <text x="415" y="50">Embeddings</text><text x="415" y="65" font-size="10" fill="#5b6474">384 numbers each</text>
+    <text x="612" y="50">index/</text><text x="612" y="65" font-size="10" fill="#5b6474">vectors.npy + chunks.json</text>
+  </g>
+  <g stroke="#5b6474" marker-end="url(#a)"><line x1="130" y1="52" x2="172" y2="52"/><line x1="295" y1="52" x2="337" y2="52"/><line x1="490" y1="52" x2="532" y2="52"/></g>
+
+  <text x="10" y="118" font-weight="700" fill="#1f8a4c">ANSWERING: ask.py (every question)</text>
+  <g fill="#eef8f1" stroke="#9ccdb0">
+    <rect x="10" y="135" width="110" height="44" rx="6"/>
+    <rect x="160" y="128" width="130" height="30" rx="6"/><rect x="160" y="166" width="130" height="30" rx="6"/>
+    <rect x="330" y="135" width="110" height="44" rx="6"/><rect x="475" y="135" width="100" height="44" rx="6"/>
+    <rect x="475" y="215" width="100" height="44" rx="6"/><rect x="300" y="215" width="140" height="44" rx="6"/>
+    <rect x="130" y="215" width="130" height="44" rx="6"/>
+  </g>
+  <g text-anchor="middle" fill="#1d2330">
+    <text x="65" y="161">Question</text>
+    <text x="225" y="147">Vector search</text><text x="225" y="185">BM25 search</text>
+    <text x="385" y="155">RRF fusion</text><text x="385" y="170" font-size="10" fill="#5b6474">top 20</text>
+    <text x="525" y="155">Reranker</text><text x="525" y="170" font-size="10" fill="#5b6474">top 4</text>
+    <text x="525" y="235">Prompt</text><text x="525" y="250" font-size="10" fill="#5b6474">numbered sources</text>
+    <text x="370" y="235">Groq LLM</text><text x="370" y="250" font-size="10" fill="#5b6474">temperature 0.1</text>
+    <text x="195" y="235">Cited answer</text><text x="195" y="250" font-size="10" fill="#5b6474">+ source list</text>
+  </g>
+  <g stroke="#5b6474" fill="none" marker-end="url(#a)">
+    <line x1="120" y1="150" x2="157" y2="143"/><line x1="120" y1="165" x2="157" y2="180"/>
+    <line x1="290" y1="143" x2="327" y2="152"/><line x1="290" y1="181" x2="327" y2="165"/>
+    <line x1="440" y1="157" x2="472" y2="157"/><line x1="525" y1="179" x2="525" y2="212"/>
+    <line x1="475" y1="237" x2="443" y2="237"/><line x1="300" y1="237" x2="263" y2="237"/>
+  </g>
+  <path d="M612 74 C 612 105, 300 100, 230 125" stroke="#9fb3e6" stroke-dasharray="4 3" fill="none" marker-end="url(#a)"/>
+  <text x="430" y="104" font-size="10" fill="#5b6474">loaded by Retriever</text>
+</svg>
+<figcaption>Figure 1. The two phases. Everything left of the LLM is "retrieval"; it's where most quality problems live.</figcaption>
+</figure>
+<div class="box key"><b>Key insight.</b> If retrieval doesn't find the right chunk, no LLM can answer correctly. That's why most of this project (and most real RAG work) is about retrieval quality, and why we evaluate retrieval separately.</div>
+
+<!-- ============ 4 ============ -->
+<h2 class="page">4. Chunking</h2>
+<p>We don't search whole documents; we search <b>chunks</b>, passages of up to <code>CHUNK_MAX_CHARS = 800</code> characters (~150–200 words). Why not whole documents? A 50-page PDF would match almost any question weakly, and pasting all of it into the prompt would be slow and expensive. Why not single sentences? "You get 10 days." doesn't say <i>10 days of what</i>.</p>
+<h3>How our chunker works (<code>documents.py</code>)</h3>
+<ol>
+  <li><b>Split into paragraphs</b> at blank lines. A paragraph is a natural unit of meaning, so we avoid cutting inside one.</li>
+  <li><b>Track headings.</b> Every paragraph is tagged with the Markdown heading above it (e.g. <i>Sick leave</i>).</li>
+  <li><b>Pack greedily.</b> Keep adding paragraphs to the current chunk until the next one won't fit, then start a new chunk.</li>
+  <li><b>Never mix sections.</b> A new heading always starts a new chunk, so one chunk = one topic.</li>
+  <li><b>Overlap.</b> A new chunk (within the same section) starts with the last ~150 characters of the previous one, so a fact sitting on the boundary is complete in at least one chunk.</li>
+  <li><b>Giant paragraphs</b> are split at sentence ends, or at spaces if one "sentence" is still too long (<code>hard_split</code>).</li>
+</ol>
+<h3>Contextual chunk headers</h3>
+<p>Before embedding, each chunk is prefixed with where it came from:</p>
+<pre><span class="c"># Chunk.embedding_text()</span>
+leave-policy.md &gt; Sick leave
+You get 10 days of paid sick leave per year. A doctor's note is only required if ...</pre>
+<p>The word "sick" now appears in the searchable text even if the paragraph itself never said it. This cheap trick noticeably improves both vector and keyword search.</p>
+<div class="box"><b>Tuning trade-off.</b> Smaller chunks = more precise matches but less context per chunk. Bigger chunks = more context but diluted matches and more prompt tokens. 500–1,000 characters with 10–20% overlap is a common starting point. Change it in <code>config.py</code>, re-run <code>ingest.py</code> and <code>evaluate.py</code>, and let the numbers decide.</div>
+
+<!-- ============ 5 ============ -->
+<h2>5. Embeddings &amp; vector search</h2>
+<p>An <b>embedding</b> is a list of numbers that represents the <i>meaning</i> of a text. Our model, <code>BAAI/bge-small-en-v1.5</code>, turns any text into <b>384 numbers</b>. It was trained so that texts with similar meaning get similar numbers: "Can I bring my puppy?" ends up close to "Dogs are welcome on Fridays", even though they share no words.</p>
+<figure>
+<svg viewBox="0 0 520 210" width="78%" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, sans-serif" font-size="11">
+  <defs><marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2f5bd3"/></marker>
+  <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1f8a4c"/></marker>
+  <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+  <line x1="40" y1="185" x2="500" y2="185" stroke="#ccc"/><line x1="40" y1="185" x2="40" y2="10" stroke="#ccc"/>
+  <line x1="40" y1="185" x2="330" y2="40" stroke="#2f5bd3" stroke-width="2" marker-end="url(#b)"/>
+  <line x1="40" y1="185" x2="360" y2="70" stroke="#1f8a4c" stroke-width="2" marker-end="url(#g)"/>
+  <line x1="40" y1="185" x2="470" y2="165" stroke="#c0392b" stroke-width="2" marker-end="url(#r)"/>
+  <text x="250" y="34" fill="#2f5bd3">query: "bring my puppy to work?"</text>
+  <text x="365" y="78" fill="#1f8a4c">"Dogs welcome on Fridays"</text>
+  <text x="330" y="158" fill="#c0392b">"Passwords: 14 characters"</text>
+  <path d="M110 150 A 80 80 0 0 1 116 142" stroke="#1f8a4c" fill="none"/>
+  <text x="120" y="150" fill="#1f8a4c" font-size="10">small angle = similar</text>
+</svg>
+<figcaption>Figure 2. Embeddings drawn in 2-D (the real ones have 384 dimensions). Similar meaning = arrows pointing the same way.</figcaption>
+</figure>
+<h3>Cosine similarity</h3>
+<p>We compare two embeddings by the angle between them: <b>cosine similarity = (a · b) / (|a| × |b|)</b>. It's 1 for the same direction (same meaning), around 0 for unrelated. fastembed returns vectors already <b>normalised</b> to length 1, so |a| = |b| = 1 and cosine similarity is just the <b>dot product</b>. That's why searching every chunk is one line of NumPy:</p>
+<pre><span class="c"># retriever.py: vectors is a (27 chunks x 384) matrix, q is (384,)</span>
+sims = self.vectors @ q            <span class="c"># 27 similarity scores in one matrix multiply</span>
+top = np.argsort(-sims)[:k]        <span class="c"># indices of the k highest scores</span></pre>
+<h3>Query vs passage embeddings</h3>
+<p>BGE models expect a question to be embedded slightly differently from a document (a short instruction is prepended). That's why the code uses <code>query_embed()</code> for questions and <code>passage_embed()</code> for chunks. Questions and answers are phrased differently ("How many days…?" vs "Employees receive 24 days…"), and this "asymmetric" setup accounts for that.</p>
+<div class="box"><b>Do I need a vector database?</b> Not for 27 chunks, or even 50,000: a brute-force NumPy dot product is milliseconds. Vector databases (pgvector, Qdrant, Chroma, Pinecone) earn their place with millions of vectors (they use <i>approximate nearest neighbour</i> indexes like HNSW), metadata filters, concurrent updates and persistence. Knowing when you <i>don't</i> need one is a good interview answer.</div>
+<div class="box warn"><b>Weakness of embeddings:</b> exact tokens. Codes (<code>EXP-44</code>), product names, IDs and rare acronyms often embed poorly, because the model has no idea what "EXP-44" means. That's the gap BM25 fills.</div>
+
+<!-- ============ 6 ============ -->
+<h2 class="page">6. BM25 keyword search</h2>
+<p>BM25 is the ranking formula behind classic search engines (Elasticsearch, Lucene, OpenSearch). We wrote it from scratch in <code>bm25.py</code> (about 40 lines) so nothing is magic. For a query, each chunk's score is the sum over query words <i>t</i>:</p>
+<pre>score(chunk) = Σ  IDF(t) × tf × (k1 + 1) / ( tf + k1 × (1 − b + b × len / avg_len) )
+
+tf      = how many times word t appears in this chunk
+IDF(t)  = log(1 + (N − df + 0.5) / (df + 0.5))   N = chunks, df = chunks containing t
+len     = words in this chunk, avg_len = average over all chunks
+k1=1.5, b=0.75 (standard defaults)</pre>
+<table>
+<tr><th>Part</th><th>Intuition</th></tr>
+<tr><td><b>IDF</b> (inverse document frequency)</td><td>Rare words matter more. "EXP-44" appears in 1 chunk → big weight. "leave" appears in many → small weight.</td></tr>
+<tr><td><b>tf with k1</b> (term frequency, saturating)</td><td>Mentioning a word 2× is better than 1×, but 20× isn't 20× better. k1 controls how fast it saturates.</td></tr>
+<tr><td><b>Length normalisation (b)</b></td><td>A short chunk that mentions "VPN" is probably <i>about</i> VPNs; a long one may mention it in passing.</td></tr>
+</table>
+<p><b>Tokenisation</b> matters: we lowercase, keep hyphenated codes like <code>exp-44</code> as one token, and drop <b>stopwords</b> ("the", "how", "is"…) that carry no meaning. (Section 13 shows what happens when a stopword slips through.)</p>
+<div class="two">
+<div class="box lesson"><b>BM25 is good at:</b> exact codes, names, numbers, rare jargon. It's fast and needs no model.</div>
+<div class="box warn"><b>BM25 is bad at:</b> synonyms and paraphrases. "refund" ≠ "reimbursed", "vacation" ≠ "annual leave", "puppy" ≠ "dog".</div>
+</div>
+
+<!-- ============ 7 ============ -->
+<h2>7. Hybrid search &amp; Reciprocal Rank Fusion</h2>
+<p>Vector search understands meaning; BM25 catches exact words. <b>Hybrid search</b> runs both and merges the results. The catch: their scores are on different scales (cosine ≈ 0.4–0.8, BM25 ≈ 0–20), so you can't just add them.</p>
+<p><b>Reciprocal Rank Fusion (RRF)</b> ignores the raw scores and uses only each chunk's <b>rank</b> in each list:</p>
+<pre>RRF(chunk) = Σ over lists   1 / (60 + rank in that list)        <span class="c"># 60 = RRF_K, the standard constant</span></pre>
+<p>A chunk ranked #1 in one list gets 1/61 = 0.0164. Ranked #1 in <i>both</i>: 0.0328. The constant 60 flattens the curve so a single #1 can't dominate. Agreement between the two methods is what wins.</p>
+<h3>Worked example: where hybrid went wrong</h3>
+<p>Real numbers from our index for the question <i>"When will my expense refund arrive?"</i> (the answer, "paid on the 28th", lives in the <i>Submitting a claim</i> chunk):</p>
+<table>
+<tr><th>Chunk</th><th>Vector rank (cosine)</th><th>BM25 rank (score)</th><th>RRF score</th><th>Hybrid rank</th></tr>
+<tr><td>Expense codes</td><td>#2 (0.625)</td><td>#1 (3.28)</td><td>1/62 + 1/61 = 0.0325</td><td>1</td></tr>
+<tr><td>Booking travel</td><td>#4 (0.585)</td><td>#4 (1.88)</td><td>0.0312</td><td>2</td></tr>
+<tr><td>Lost or stolen devices</td><td>#7 (0.534)</td><td>#2 (2.19)</td><td>0.0311</td><td>3</td></tr>
+<tr><td>Sick leave</td><td>#15 (0.475)</td><td>#3 (1.93)</td><td>0.0292</td><td>4</td></tr>
+<tr style="background:#fdeceb"><td><b>Submitting a claim ✔</b></td><td><b>#1 (0.707)</b></td><td>not found (0)</td><td>1/61 = 0.0164</td><td><b>5 → cut off</b></td></tr>
+</table>
+<p>Vector search got it right, but the document says "reimbursed", never "refund", so BM25 didn't find the right chunk at all. BM25 instead ranked chunks that happened to share words like "expense" and "will". Those chunks appeared in <i>both</i> lists, so their small scores added up and pushed the correct answer out of the top 4.</p>
+<div class="box key"><b>Lesson.</b> Hybrid is not automatically better. RRF rewards agreement, so when one method is confidently right and the other is confidently noisy, fusion can hurt. You only discover this by evaluating. The fix is a stage that actually <i>reads</i> the candidates: a reranker.</div>
+
+<!-- ============ 8 ============ -->
+<h2 class="page">8. Reranking (two-stage retrieval)</h2>
+<p>Our embedding model is a <b>bi-encoder</b>: it encodes the question and each chunk <i>separately</i>, then compares vectors. That's fast (chunk vectors are computed once, in advance), but the model never sees the question and the chunk together.</p>
+<p>A <b>cross-encoder</b> takes <code>question + chunk</code> as <i>one</i> input and outputs a relevance score. It can notice that "refund arrive" is answered by "reimbursed with your next salary payment on the 28th". It's much more accurate, but must run once per (question, chunk) pair at question time, which is too slow for a million chunks.</p>
+<table>
+<tr><th></th><th>Bi-encoder (embeddings)</th><th>Cross-encoder (reranker)</th></tr>
+<tr><td>Input</td><td>Question and chunk separately</td><td>Question + chunk together</td></tr>
+<tr><td>Precompute chunks?</td><td>Yes, at indexing time</td><td>No, runs per question</td></tr>
+<tr><td>Speed</td><td>Very fast, scales to millions</td><td>Slow; use on ~20–100 candidates</td></tr>
+<tr><td>Accuracy</td><td>Good</td><td>Better</td></tr>
+<tr><td>Our model</td><td><code>bge-small-en-v1.5</code></td><td><code>ms-marco-MiniLM-L-6-v2</code> (80 MB)</td></tr>
+</table>
+<p>So we combine them: <b>stage 1</b> (hybrid) quickly fetches 20 candidates with high <i>recall</i>; <b>stage 2</b> (reranker) carefully orders them for <i>precision</i>, and we keep the top 4.</p>
+<pre><span class="c"># retriever.py: rerank_search</span>
+candidates = self.hybrid_search(query, config.RERANK_CANDIDATES)          <span class="c"># 20, fast</span>
+scores = list(reranker().rerank(query, [c.embedding_text() for c, _ in candidates]))
+ranked = sorted(zip(candidates, scores), key=lambda pair: -pair[1])[:k]   <span class="c"># best 4</span></pre>
+<p>On the refund question the reranker put <i>Submitting a claim</i> first by a wide margin (score −2.6 vs −10.0 for the next). Reranker scores are raw "logits": only their order matters, and negative values are normal.</p>
+
+<!-- ============ 9 ============ -->
+<h2>9. Prompting for cited answers</h2>
+<p>The retrieved chunks are numbered and placed in the user message; the rules go in the system prompt (<code>ask.py</code>):</p>
+<pre><b>System:</b> You answer questions using ONLY the numbered sources provided.
+- After every fact, cite the source number in square brackets, like [1] or [2][3].
+- If the sources do not contain the answer, say: "I couldn't find that in the
+  documents." Do not guess or use outside knowledge.
+- Be concise.
+
+<b>User:</b> Sources:
+[1] (from expenses-and-travel.md, section "Submitting a claim")
+Submit claims in Brewbook ... reimbursed with your next salary payment on the 28th ...
+[2] (from ...)
+Question: When will my expense refund arrive?</pre>
+<ul>
+  <li><b>Numbered sources</b> let the model cite and let us print a source list the user can verify. Trust comes from checkability.</li>
+  <li><b>An explicit "I don't know" sentence</b> gives the model a safe exit instead of inventing an answer. We tested it: <i>"What is the CEO's salary?"</i> → "I couldn't find that in the documents."</li>
+  <li><b>temperature = 0.1</b>: we want faithful extraction, not creativity.</li>
+  <li><b>Streaming</b> prints tokens as they arrive, the same technique as Nova.</li>
+</ul>
+
+<!-- ============ 10 ============ -->
+<h2>10. Evaluation</h2>
+<p>Without measurement, every change is a guess. <code>eval/questions.json</code> holds 18 test questions, each with the file that holds the answer and a phrase that must appear in the correct chunk:</p>
+<pre>{"question": "Am I allowed to bring my puppy to work?",
+ "source": "office-and-culture.md", "expected": "Fridays"}</pre>
+<p>The questions are deliberately mixed: some share words with the documents (<i>"What is expense code EXP-44 used for?"</i>), others are paraphrases (<i>"vacation days"</i> for "annual leave", <i>"pen drive"</i> for "USB storage", <i>"refund"</i> for "reimbursed").</p>
+<h3>The two metrics</h3>
+<table>
+<tr><th>Metric</th><th>Meaning</th><th>Example (3 questions, correct chunk at rank 1, 2, missing)</th></tr>
+<tr><td><b>Hit@k</b></td><td>Share of questions where a correct chunk is anywhere in the top k. "Could the LLM possibly answer?"</td><td>2 of 3 found → 67%</td></tr>
+<tr><td><b>MRR</b> (Mean Reciprocal Rank)</td><td>Average of 1/rank (0 if missing). Rewards putting the answer <i>first</i>.</td><td>(1 + ½ + 0) / 3 = 0.50</td></tr>
+</table>
+<h3>Our results (top-4)</h3>
+<table>
+<tr><th>Method</th><th>Hit@4</th><th>MRR</th><th>Observation</th></tr>
+<tr><td>BM25 only</td><td>94%</td><td>0.78</td><td>Fails on paraphrase ("refund"); often ranks the answer 2nd</td></tr>
+<tr><td>Vector only</td><td>100%</td><td>0.96</td><td>Strong, but "which days in the office" was only #4</td></tr>
+<tr><td>Hybrid (RRF)</td><td>94%</td><td>0.94</td><td>Fixed the office question, broke the refund question</td></tr>
+<tr><td><b>Hybrid + rerank</b></td><td><b>100%</b></td><td><b>1.00</b></td><td>Correct chunk ranked first on every question</td></tr>
+</table>
+<div class="box warn"><b>Be honest about this.</b> 18 questions that I wrote myself over 4 short documents is a <i>regression test</i>, not a benchmark. 100% here does not mean 100% on real data. Say this in interviews; it shows maturity. To make it stronger: add 50+ questions, include questions with <i>no</i> answer, and use questions written by someone else.</div>
+<p>Note that we evaluate <b>retrieval</b> only. Evaluating the <i>answers</i> (faithfulness: is every claim supported by the cited source?) usually uses an "LLM-as-judge"; that's a planned next project.</p>
+
+<!-- ============ 11 ============ -->
+<h2 class="page">11. Code walkthrough</h2>
+<table>
+<tr><th>File</th><th>Responsibility</th><th>Key things to remember</th></tr>
+<tr><td><code>config.py</code></td><td>All settings</td><td>Chunk size/overlap, model names, TOP_K, RRF_K, rerank candidates, Groq key from <code>.env</code></td></tr>
+<tr><td><code>documents.py</code></td><td>Load + chunk</td><td><code>Chunk</code> dataclass (id, source, section, text); <code>load_documents</code>, <code>split_into_blocks</code>, <code>hard_split</code>, <code>chunk_document</code></td></tr>
+<tr><td><code>bm25.py</code></td><td>Keyword ranking</td><td><code>tokenize</code> + stopwords; IDF computed once in <code>__init__</code>; <code>scores(query)</code></td></tr>
+<tr><td><code>retriever.py</code></td><td>Index + search</td><td>Models loaded lazily once; <code>save_index</code>; <code>Retriever</code> with 4 methods; checks the index was built with the same model</td></tr>
+<tr><td><code>ingest.py</code></td><td>Build index</td><td>load → chunk → embed → save; prints chunk counts and matrix shape</td></tr>
+<tr><td><code>ask.py</code></td><td>Answer questions</td><td><code>build_prompt</code> numbers sources; streams Groq output; prints the source list</td></tr>
+<tr><td><code>evaluate.py</code></td><td>Measure</td><td><code>first_correct_rank</code>; Hit@k and MRR per method</td></tr>
+</table>
+
+<h3>documents.py: the packing loop</h3>
+<pre>for section, para in split_into_blocks(text):
+    for piece in hard_split(para, max_chars) if len(para) &gt; max_chars else [para]:
+        if section != current_section:              <span class="c"># new heading: always a new chunk</span>
+            flush(); current, current_section = piece, section
+        elif len(current) + len(piece) + 2 &gt; max_chars:   <span class="c"># won't fit: new chunk</span>
+            flush()
+            tail = current[-overlap_chars:]         <span class="c"># overlap from previous chunk</span>
+            tail = tail[tail.find(" ") + 1:]         <span class="c"># start at a word boundary</span>
+            fits = tail and len(tail) + len(piece) + 2 &lt;= max_chars
+            current = f"{tail}\n\n{piece}" if fits else piece
+        else:
+            current = f"{current}\n\n{piece}"        <span class="c"># fits: keep packing</span></pre>
+<p><code>flush()</code> is a nested function that appends the current text as a <code>Chunk</code>. <code>nonlocal</code> lets it modify the outer variable.</p>
+
+<h3>retriever.py: hybrid search</h3>
+<pre>pool = max(k * 5, 20)                     <span class="c"># look deeper than k before merging</span>
+fused = {}
+for results in (self.vector_search(query, pool), self.bm25_search(query, pool)):
+    for rank, (chunk, _) in enumerate(results, start=1):
+        fused[chunk.id] = fused.get(chunk.id, 0.0) + 1.0 / (config.RRF_K + rank)
+top = sorted(fused, key=lambda i: -fused[i])[:k]</pre>
+
+<h3>What the index looks like on disk</h3>
+<pre>index/vectors.npy   NumPy array, shape (27, 384), float32: one row per chunk
+index/chunks.json   [{"id": 0, "source": "expenses-and-travel.md",
+                      "section": "Booking travel", "text": "All business trips ..."}, ...]
+index/meta.json     which embedding model and chunk settings built it</pre>
+<p>Row <i>i</i> of the matrix is the embedding of chunk <i>i</i>; that shared position is the only link between the two files. <code>meta.json</code> exists because mixing vectors from two different models is a silent bug: the numbers would be meaningless, but nothing would crash.</p>
+
+<!-- ============ 12 ============ -->
+<h2>12. How to run &amp; experiment</h2>
+<pre>cd rag
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+copy .env.example .env               <span class="c"># paste your Groq key</span>
+python ingest.py                     <span class="c"># first run downloads ~150 MB of models</span>
+python evaluate.py --verbose
+python ask.py                        <span class="c"># interactive; empty line quits</span>
+python ask.py --show-context "Can I fly business class?"
+python ask.py --method bm25 "When will my expense refund arrive?"   <span class="c"># watch it fail</span></pre>
+<h3>Experiments worth doing (learn by breaking things)</h3>
+<ol>
+  <li>Set <code>CHUNK_MAX_CHARS = 200</code>, re-ingest, re-evaluate. What happened to MRR? Why?</li>
+  <li>Remove the header from <code>embedding_text()</code> (return only <code>self.text</code>). Which questions get worse?</li>
+  <li>Add "will" to <code>STOPWORDS</code> and look at BM25's ranking for the refund question again.</li>
+  <li>Set <code>RRF_K = 1</code>. Now rank #1 is worth far more than #2. Does hybrid improve?</li>
+  <li>Write 5 new questions that you expect to fail, then try to fix them.</li>
+  <li>Drop a real PDF (a course syllabus, a product manual) into <code>data/</code> and chat with it.</li>
+</ol>
+
+<!-- ============ 13 ============ -->
+<h2 class="page">13. Problems we hit (real engineering lessons)</h2>
+<div class="box"><b>1. The Gemini API key was rejected.</b> The plan was to use Gemini's embedding API. The key in <code>chatbot/.env</code> returned <code>API_KEY_INVALID</code>. Instead of blocking, we switched to <b>local embeddings</b> with fastembed (ONNX models on the CPU). This turned out better for a portfolio: free, offline, no rate limits, and anyone can run the project with only a Groq key. <i>Lesson: keep provider choices swappable behind one function (<code>embed_passages</code>).</i></div>
+<div class="box"><b>2. Hybrid search made one question worse.</b> Section 7 in full. Found only because <code>evaluate.py</code> compared methods side by side. <i>Lesson: "best practice" components must still be measured on your data.</i></div>
+<div class="box"><b>3. The stopword leak.</b> BM25 ranked <i>Lost or stolen devices</i> #2 for the refund question. Why? Both contain the word "will" ("You <u>will</u> not be blamed…"), and "will" isn't in our stopword list. <i>Lesson: inspect why wrong results rank high; the cause is often mundane.</i></div>
+<div class="box"><b>4. Windows console crash: <code>UnicodeEncodeError: 'charmap' codec can't encode ' '</code>.</b> The model output a narrow no-break space, and the Windows console defaults to the old cp1252 encoding. Fix: <code>sys.stdout.reconfigure(encoding="utf-8", errors="replace")</code>. <i>Lesson: LLM output is untrusted text: any Unicode character can appear.</i></div>
+<div class="box"><b>5. Oversized chunks.</b> A test with very long paragraphs showed chunks of 379 characters when the limit was 300: overlap was added <i>on top of</i> a full-size piece. Fix: only prepend the overlap if the result still fits; and <code>hard_split</code> now falls back to splitting at spaces when a "sentence" has no full stop. <i>Lesson: test edge cases of your own utilities with synthetic input.</i></div>
+
+<!-- ============ 14 ============ -->
+<h2>14. Limitations &amp; next steps</h2>
+<table>
+<tr><th>Limitation</th><th>Better approach</th></tr>
+<tr><td>PDF text loses layout: paragraphs, tables and columns can merge</td><td>Layout-aware parsers (e.g. PyMuPDF, docling, unstructured); OCR for scanned PDFs</td></tr>
+<tr><td>Re-indexes everything on every run</td><td>Incremental indexing: hash each file, only re-embed changed ones</td></tr>
+<tr><td>No conversation memory: "what about sick leave?" as a follow-up fails</td><td>Query rewriting: have the LLM turn the follow-up into a standalone question first</td></tr>
+<tr><td>Small eval set, retrieval only</td><td>50+ questions, unanswerable cases, answer faithfulness via LLM-as-judge, run in CI</td></tr>
+<tr><td>CLI only</td><td>Add a <code>/api/ask</code> endpoint to the Nova FastAPI app with an upload button</td></tr>
+<tr><td>Brute-force search in memory</td><td>pgvector / Qdrant once there are many documents or many users</td></tr>
+<tr><td>No access control</td><td>Real systems must filter chunks by what the <i>user</i> is allowed to see, <i>before</i> retrieval</td></tr>
+</table>
+
+<!-- ============ 15 ============ -->
+<h2 class="page">15. Interview questions (with answers)</h2>
+<dl class="qa">
+<dt>Q1. What is RAG and when would you use it instead of fine-tuning?</dt>
+<dd>Retrieve relevant documents and put them in the prompt so the model answers from them. Use it for knowledge that is private, changes often, or must be cited. Fine-tuning is for behaviour/style/format, not facts.</dd>
+<dt>Q2. How do you choose chunk size?</dt>
+<dd>Trade-off between precision (small) and context (large). Start around 500–1,000 characters with 10–20% overlap, respect natural boundaries (paragraphs, headings), then tune with a retrieval eval set.</dd>
+<dt>Q3. What is cosine similarity, and why is a dot product enough here?</dt>
+<dd>The cosine of the angle between two vectors: 1 means same direction (meaning). When vectors are normalised to length 1, the dot product equals the cosine.</dd>
+<dt>Q4. Why combine keyword and vector search?</dt>
+<dd>Vectors handle synonyms and paraphrase; BM25 handles exact tokens like codes and names. Each covers the other's blind spot.</dd>
+<dt>Q5. How does Reciprocal Rank Fusion work, and why not just add the scores?</dt>
+<dd>Score = Σ 1/(k + rank) across lists, k≈60. Raw scores are on incompatible scales; ranks are comparable. Caveat: it rewards agreement, so a result found by only one retriever can be outvoted (our refund example).</dd>
+<dt>Q6. Bi-encoder vs cross-encoder?</dt>
+<dd>A bi-encoder embeds query and document separately (fast, precomputable, used for retrieval). A cross-encoder reads them together (slow, more accurate, used to rerank a short candidate list).</dd>
+<dt>Q7. How do you evaluate a RAG system?</dt>
+<dd>Separately: <b>retrieval</b> (Hit@k / recall@k, MRR, nDCG on labelled questions) and <b>generation</b> (faithfulness to sources, answer correctness, correct refusal when the answer is absent), often with an LLM judge plus spot checks.</dd>
+<dt>Q8. How do you reduce hallucinations in RAG?</dt>
+<dd>Better retrieval (the main cause is missing context), instructions to answer only from sources, an explicit "I don't know" option, required citations, low temperature, and faithfulness checks.</dd>
+<dt>Q9. When do you need a vector database?</dt>
+<dd>When brute force gets too slow (roughly millions of vectors), or you need ANN indexes, metadata filtering, concurrent writes, persistence and access control. For small corpora, a NumPy matrix is fine.</dd>
+<dt>Q10. Tell me about a bug or surprise in this project.</dt>
+<dd>Adding hybrid search made one question fail: the docs said "reimbursed", the user said "refund". BM25 returned noise, and RRF let that noise outvote vector search's correct #1. I found it via per-method evaluation and fixed it with a cross-encoder reranker: Hit@4 94% → 100%, MRR 0.94 → 1.00.</dd>
+</dl>
+
+<!-- ============ 16 ============ -->
+<h2>16. Glossary &amp; cheat sheet</h2>
+<table>
+<tr><th>Term</th><th>Meaning</th></tr>
+<tr><td>Chunk</td><td>A passage of a document; the unit we search and cite</td></tr>
+<tr><td>Embedding</td><td>Vector of numbers representing meaning (384 numbers here)</td></tr>
+<tr><td>Cosine similarity</td><td>Similarity of two vectors by angle; dot product when normalised</td></tr>
+<tr><td>BM25</td><td>Keyword ranking formula using TF, IDF and length normalisation</td></tr>
+<tr><td>TF / IDF</td><td>Term frequency (how often in this chunk) / inverse document frequency (how rare overall)</td></tr>
+<tr><td>Stopword</td><td>Very common word ignored by keyword search ("the", "is")</td></tr>
+<tr><td>Hybrid search</td><td>Combining keyword and vector results</td></tr>
+<tr><td>RRF</td><td>Reciprocal Rank Fusion: merge rankings via Σ 1/(60 + rank)</td></tr>
+<tr><td>Bi-encoder / Cross-encoder</td><td>Encode separately (fast) / encode together (accurate)</td></tr>
+<tr><td>Reranker</td><td>Cross-encoder that re-orders retrieval candidates</td></tr>
+<tr><td>Recall vs precision</td><td>Did we find it at all? vs. is what we returned relevant?</td></tr>
+<tr><td>Hit@k, MRR</td><td>Answer in top k? / average of 1 ÷ rank of first correct result</td></tr>
+<tr><td>Contextual chunk header</td><td>File + section name prepended to a chunk before indexing</td></tr>
+<tr><td>Grounding / faithfulness</td><td>The answer is supported by the provided sources</td></tr>
+<tr><td>ANN / HNSW</td><td>Approximate nearest neighbour search; the index type in vector databases</td></tr>
+</table>
+<div class="box key"><b>One-sentence summary to remember:</b> chunk well, retrieve wide with hybrid search, rerank narrow with a cross-encoder, make the model cite or refuse, and measure every change with an eval set.</div>
+
+</body>
+</html>
