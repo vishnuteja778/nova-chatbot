@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nova · Multi-Agent AI Engineering</title>
+<meta name="description" content="Nova: a multi-agent research assistant with tool calling, hybrid-search RAG and cited answers, built on free-tier APIs by Vishnu Teja.">
+<meta name="theme-color" content="#030305">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%23030305'/><circle cx='16' cy='16' r='9' fill='none' stroke='%232dd4bf' stroke-width='1.6'/><circle cx='16' cy='16' r='3.4' fill='%23a855f7'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script type="importmap">
+  { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+<style>
+  :root {
+    --void: #030305;
+    --mint: #2dd4bf;
+    --violet: #a855f7;
+    --ink: #ecebf3;
+    --soft: #a7a6b8;
+    --dim: #6d6c80;
+    --line: rgba(236, 235, 243, .09);
+    --panel: rgba(10, 10, 16, .62);
+    --sans: "Outfit", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+    --ease: cubic-bezier(.22, 1, .36, 1);
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--void); }
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  body {
+    margin: 0; background: var(--void); color: var(--ink);
+    font: 300 17px/1.65 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  ::selection { background: rgba(168, 85, 247, .35); color: #fff; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--mint); outline-offset: 3px; border-radius: 6px; }
+
+  /* The particle mind sits behind everything */
+  #mind { position: fixed; inset: 0; z-index: 0; display: block; }
+  .veil {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: radial-gradient(ellipse 120% 80% at 50% 50%, transparent 30%, rgba(3, 3, 5, .55) 75%, var(--void) 100%);
+  }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px clamp(20px, 4vw, 48px);
+    background: linear-gradient(to bottom, rgba(3, 3, 5, .85), transparent);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 500; font-size: 18px; letter-spacing: .02em; }
+  .brand svg { width: 22px; height: 22px; }
+  .nav-links { display: flex; align-items: center; gap: 28px; font: 400 13px/1 var(--mono); color: var(--soft); }
+  .nav-links a { text-decoration: none; transition: color .2s var(--ease); }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta {
+    padding: 10px 16px; border-radius: 999px; border: 1px solid rgba(45, 212, 191, .45);
+    color: var(--mint) !important; background: rgba(45, 212, 191, .06);
+  }
+  .nav-cta:hover { background: rgba(45, 212, 191, .14); }
+
+  /* ---------- Layout ---------- */
+  main { position: relative; z-index: 2; }
+  section { position: relative; padding: 0 clamp(20px, 6vw, 96px); }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font: 500 12px/1 var(--mono); color: var(--mint); letter-spacing: .14em; text-transform: uppercase;
+  }
+  .eyebrow::before { content: ""; width: 24px; height: 1px; background: currentColor; }
+  h1, h2, h3 { font-weight: 300; margin: 0; letter-spacing: -.02em; }
+  h2 { font-size: clamp(34px, 5vw, 60px); line-height: 1.05; margin: 20px 0 20px; }
+  h3 { font-size: 22px; font-weight: 400; line-height: 1.3; }
+  .grad { background: linear-gradient(100deg, var(--mint), var(--violet)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { color: var(--soft); font-size: clamp(17px, 1.6vw, 20px); max-width: 44rem; margin: 0; }
+  .mono { font-family: var(--mono); }
+
+  /* ---------- Hero ---------- */
+  .hero { min-height: 100vh; display: flex; align-items: flex-end; padding-bottom: 12vh; }
+  .hero h1 { font-size: clamp(56px, 11vw, 168px); line-height: .9; letter-spacing: -.045em; font-weight: 200; margin: 24px 0 28px; }
+  .hero .lead { max-width: 38rem; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 24px; border-radius: 999px;
+    font: 500 15px/1 var(--sans); text-decoration: none; transition: transform .25s var(--ease), background .25s var(--ease), box-shadow .25s var(--ease);
+  }
+  .btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .btn.primary { background: linear-gradient(100deg, var(--mint), #7c8cf5 55%, var(--violet)); color: #050508; box-shadow: 0 0 40px -8px rgba(45, 212, 191, .55); }
+  .btn.primary:hover { transform: translateY(-2px); box-shadow: 0 0 60px -6px rgba(168, 85, 247, .6); }
+  .btn.ghost { border: 1px solid var(--line); background: rgba(255, 255, 255, .03); color: var(--ink); }
+  .btn.ghost:hover { background: rgba(255, 255, 255, .07); }
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; margin-top: 64px; background: var(--line); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; max-width: 900px; }
+  .stat { padding: 20px 22px; background: rgba(5, 5, 9, .7); backdrop-filter: blur(6px); }
+  .stat b { display: block; font: 300 34px/1 var(--sans); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .stat span { display: block; margin-top: 8px; font: 400 12px/1.4 var(--mono); color: var(--dim); }
+  .scroll-cue { position: absolute; right: clamp(20px, 6vw, 96px); bottom: 12vh; font: 400 12px/1 var(--mono); color: var(--dim); writing-mode: vertical-rl; letter-spacing: .2em; }
+
+  /* ---------- Content blocks ---------- */
+  .chapter { padding-top: 22vh; padding-bottom: 22vh; }
+  .chapter.tall { min-height: 140vh; }
+  .panel {
+    border: 1px solid var(--line); border-radius: 22px; background: var(--panel);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    padding: clamp(22px, 3vw, 36px);
+  }
+  .grid-2 { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: start; margin-top: 56px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 56px; }
+  .side { max-width: 34rem; }
+  .side.right { margin-left: auto; }
+
+  /* Pipeline */
+  .flow { display: flex; flex-direction: column; gap: 10px; }
+  .node {
+    display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 16px;
+    padding: 16px 18px; border-radius: 16px; border: 1px solid var(--line); background: rgba(255, 255, 255, .02);
+  }
+  .node .n { font: 500 12px/1 var(--mono); color: var(--dim); }
+  .node strong { display: block; font-weight: 500; font-size: 17px; }
+  .node small { display: block; color: var(--soft); font-size: 14px; line-height: 1.45; }
+  .node .model { font: 400 11px/1 var(--mono); color: var(--mint); white-space: nowrap; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(45, 212, 191, .3); }
+  .node.par { border-color: rgba(168, 85, 247, .35); background: rgba(168, 85, 247, .05); }
+  .node.par .model { color: #c99bfa; border-color: rgba(168, 85, 247, .35); }
+  .fork { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .fork .node { grid-template-columns: 1fr; gap: 10px; }
+  .arrow { text-align: center; font: 400 12px/1 var(--mono); color: var(--dim); padding: 2px 0; }
+
+  /* Cards */
+  .card { padding: 24px; border-radius: 18px; border: 1px solid var(--line); background: var(--panel); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .card .k { font: 500 11px/1 var(--mono); color: var(--violet); letter-spacing: .12em; text-transform: uppercase; }
+  .card h3 { margin: 14px 0 10px; }
+  .card p { margin: 0; color: var(--soft); font-size: 15px; line-height: 1.6; }
+  .card code, .panel code, .lesson code { font: 400 13px var(--mono); color: var(--mint); }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums; }
+  th { text-align: left; font: 500 11px/1 var(--mono); color: var(--dim); letter-spacing: .1em; text-transform: uppercase; padding: 0 12px 14px 0; }
+  td { padding: 12px 12px 12px 0; border-top: 1px solid var(--line); color: var(--soft); }
+  td:first-child { color: var(--ink); }
+  tr.win td { color: var(--ink); }
+  tr.win td:first-child { color: var(--mint); }
+  .bar { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .06); overflow: hidden; min-width: 120px; }
+  .bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--mint), var(--violet)); width: 0; transition: width 1.4s var(--ease); }
+  .in .bar i { width: var(--w); }
+
+  /* Code */
+  pre { margin: 0; font: 400 13px/1.7 var(--mono); color: var(--soft); white-space: pre-wrap; }
+  pre .c { color: var(--dim); }
+  pre .k { color: var(--violet); }
+  pre .s { color: var(--mint); }
+
+  /* Lessons */
+  .lessons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 56px; }
+  .lesson { padding: 24px; border-radius: 18px; border: 1px solid var(--line); background: var(--panel); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .lesson .tag { font: 500 11px/1 var(--mono); color: var(--mint); }
+  .lesson h3 { font-size: 19px; margin: 12px 0 8px; }
+  .lesson p { margin: 0; color: var(--soft); font-size: 15px; }
+  .lesson .delta { margin-top: 14px; font: 400 13px/1 var(--mono); color: var(--violet); }
+
+  /* Timeline */
+  .timeline { list-style: none; margin: 56px 0 0; padding: 0; position: relative; }
+  .timeline::before { content: ""; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 1px; background: linear-gradient(var(--mint), var(--violet)); opacity: .5; }
+  .timeline li { position: relative; padding: 0 0 36px 44px; }
+  .timeline li::before { content: ""; position: absolute; left: 0; top: 8px; width: 15px; height: 15px; border-radius: 50%; background: var(--void); border: 1px solid var(--mint); box-shadow: 0 0 14px rgba(45, 212, 191, .5); }
+  .timeline .when { font: 400 12px/1 var(--mono); color: var(--dim); }
+  .timeline h3 { margin: 8px 0 6px; }
+  .timeline p { margin: 0; color: var(--soft); max-width: 46rem; }
+
+  /* Stack */
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 40px; }
+  .chip { font: 400 13px/1 var(--mono); padding: 10px 14px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255, 255, 255, .03); color: var(--soft); }
+
+  /* Footer */
+  footer { position: relative; z-index: 2; padding: 22vh clamp(20px, 6vw, 96px) 64px; text-align: center; }
+  footer h2 { margin: 18px auto 24px; max-width: 14ch; }
+  footer .actions { justify-content: center; }
+  .credit { margin-top: 96px; font: 400 12px/1.8 var(--mono); color: var(--dim); }
+
+  /* Reveal on scroll */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 1s var(--ease), transform 1s var(--ease); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* State indicator */
+  .state {
+    position: fixed; left: clamp(20px, 4vw, 48px); bottom: 28px; z-index: 10;
+    display: flex; align-items: center; gap: 12px; font: 400 11px/1 var(--mono); color: var(--dim); letter-spacing: .12em; text-transform: uppercase;
+  }
+  .state i { width: 6px; height: 6px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 12px var(--mint); }
+  .state b { font-weight: 400; color: var(--soft); }
+
+  @media (max-width: 900px) {
+    .nav-links a:not(.nav-cta) { display: none; }
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-2, .grid-3, .lessons { grid-template-columns: 1fr; gap: 16px; }
+    .fork { grid-template-columns: 1fr; }
+    .node { grid-template-columns: 32px 1fr; }
+    .node .model { grid-column: 2; justify-self: start; }
+    .scroll-cue, .state { display: none; }
+    .chapter { padding-top: 14vh; padding-bottom: 14vh; }
+    .chapter.tall { min-height: 0; }
+    table { font-size: 14px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .bar i { transition: none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="mind" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+
+<nav class="nav" aria-label="Main">
+  <a class="brand" href="#top" aria-label="Nova">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="#2dd4bf" stroke-width="1.5"/><circle cx="12" cy="12" r="2.8" fill="#a855f7"/><circle cx="20.5" cy="12" r="1.7" fill="#ecebf3"/></svg>
+    Nova
+  </a>
+  <div class="nav-links">
+    <a href="#agents">Agents</a>
+    <a href="#rag">RAG</a>
+    <a href="#tools">Tools</a>
+    <a href="#lessons">Lessons</a>
+    <a href="#journey">Journey</a>
+    <a class="nav-cta" href="/">Open Nova →</a>
+  </div>
+</nav>
+
+<main id="top">
+  <!-- ================= STATE 1: the breathing mind ================= -->
+  <section class="hero">
+    <div class="wrap" style="width:100%">
+      <span class="eyebrow">AI engineering portfolio · Vishnu Teja</span>
+      <h1>Nova<span class="grad">.</span></h1>
+      <p class="lead">A multi-agent research assistant that plans, calls tools for live data, searches documents with hybrid RAG, writes a cited answer and reviews its own work. Built end to end on free-tier APIs.</p>
+      <div class="actions">
+        <a class="btn primary" href="/">Talk to Nova
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn ghost" href="https://github.com/vishnuteja778/nova-chatbot" target="_blank" rel="noopener">Source on GitHub</a>
+      </div>
+      <div class="stats" role="list">
+        <div class="stat" role="listitem"><b>5</b><span>cooperating agents</span></div>
+        <div class="stat" role="listitem"><b>3</b><span>Groq models in parallel</span></div>
+        <div class="stat" role="listitem"><b>94%</b><span>retrieval Hit@4</span></div>
+        <div class="stat" role="listitem"><b>$0</b><span>infrastructure cost</span></div>
+      </div>
+    </div>
+    <span class="scroll-cue" aria-hidden="true">scroll to wake the mind</span>
+  </section>
+
+  <!-- ================= What it is ================= -->
+  <section class="chapter" id="what">
+    <div class="wrap">
+      <div class="side reveal">
+        <span class="eyebrow">01 · What it is</span>
+        <h2>One question in.<br><span class="grad">A checked answer out.</span></h2>
+        <p class="lead">Nova is a chat app that decides how hard to think. A greeting gets an instant reply. A real task, like comparing two banks, analysing a stock or explaining a clause in your own PDF, goes to a team of specialist agents who gather evidence, compute exact numbers and cite every claim.</p>
+      </div>
+      <div class="grid-3">
+        <div class="card reveal"><span class="k">Answers</span><h3>Every claim has a source</h3><p>Document passages are cited as <code>D1</code>, <code>D2</code>; fetched numbers as <code>Live data</code>. A Sources list shows exactly which file and section each came from.</p></div>
+        <div class="card reveal"><span class="k">Transparency</span><h3>You watch it work</h3><p>A live, numbered work log streams each step: "Analyst → calculating 12000 × 12", "Reviewer: approved". It folds into one line when the answer lands.</p></div>
+        <div class="card reveal"><span class="k">Any task</span><h3>Not just finance</h3><p>Code, plans, comparisons, maths, document Q&amp;A and live stock research all route through the same general-purpose team.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= STATE 2: the galaxy (agents) ================= -->
+  <section class="chapter tall" id="agents">
+    <div class="wrap">
+      <div class="side right reveal">
+        <span class="eyebrow">02 · Multi-agent architecture</span>
+        <h2>A team, <span class="grad">not a prompt.</span></h2>
+        <p class="lead">Each agent is a separate LLM call with its own role, instructions, tools and model. The Planner routes; specialists work in parallel; the Writer drafts; the Reviewer can force one rewrite.</p>
+      </div>
+      <div class="grid-2">
+        <div class="flow reveal" aria-label="Agent pipeline">
+          <div class="node"><span class="n">01</span><div><strong>Planner</strong><small>JSON decision: reply directly, or assemble a team with 0–2 specialist tasks</small></div><span class="model">qwen3.8-27b</span></div>
+          <div class="arrow">↓ in parallel ↓</div>
+          <div class="fork">
+            <div class="node par"><div><strong>Analyst</strong><small>Safe calculator, live market data, web search</small></div><span class="model">gpt-oss-120b</span></div>
+            <div class="node par"><div><strong>Researcher</strong><small>Hybrid RAG over the knowledge library and your uploads</small></div><span class="model">qwen3.8-27b</span></div>
+          </div>
+          <div class="arrow">↓ compressed notes ↓</div>
+          <div class="node"><span class="n">03</span><div><strong>Writer</strong><small>Streams the answer, report, plan or code with citations</small></div><span class="model">gpt-oss-20b</span></div>
+          <div class="node"><span class="n">04</span><div><strong>Reviewer</strong><small>Checks facts, maths, code and citations; approves or requests one revision</small></div><span class="model">gpt-oss-120b</span></div>
+        </div>
+        <div class="panel reveal">
+          <span class="eyebrow">Why three models</span>
+          <h3 style="margin:16px 0 12px">Spreading load across free-tier budgets</h3>
+          <p class="lead" style="font-size:16px">Groq's free tier gives each model its own budget of ~8,000 tokens per minute. A team run uses 10–15k tokens, too much for one model, so agents are spread across three models with separate budgets.</p>
+          <table style="margin-top:28px">
+            <thead><tr><th>Guardrail</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td>Time budget per run</td><td class="mono">48 s <span style="color:var(--dim)">(Vercel limit 60 s)</span></td></tr>
+              <tr><td>Specialist tool rounds</td><td class="mono">Analyst 4 · Researcher 2</td></tr>
+              <tr><td>Revisions per answer</td><td class="mono">1</td></tr>
+              <tr><td>Explicit max_tokens</td><td class="mono">every agent</td></tr>
+              <tr><td>Groq call timeout</td><td class="mono">20 s</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= RAG ================= -->
+  <section class="chapter" id="rag">
+    <div class="wrap">
+      <div class="side reveal">
+        <span class="eyebrow">03 · Retrieval-augmented generation</span>
+        <h2>Grounded in <span class="grad">documents,</span><br>not memory.</h2>
+        <p class="lead">Text is split into section-aware chunks, embedded locally, stored as int8 vectors, and searched with two complementary methods fused by Reciprocal Rank Fusion.</p>
+      </div>
+      <div class="grid-2">
+        <div class="panel reveal">
+          <span class="eyebrow">Pipeline</span>
+          <pre style="margin-top:20px"><span class="c"># indexing</span>
+document <span class="k">→</span> chunks <span class="s">800 chars · 150 overlap · section header</span>
+         <span class="k">→</span> BGE-small embeddings <span class="s">384 dims · local · no API key</span>
+         <span class="k">→</span> int8 + base64 <span class="s">4× smaller · ~no quality loss</span>
+
+<span class="c"># every search_documents call</span>
+query <span class="k">→</span> BM25 ranking    <span class="c">exact terms: "NPA", "SEBI"</span>
+      <span class="k">→</span> vector ranking  <span class="c">meaning: "borrowing" ≈ "debt"</span>
+      <span class="k">→</span> RRF: Σ 1/(60 + rank) <span class="k">→</span> top 4 <span class="k">→</span> D1…D4</pre>
+          <p style="margin:24px 0 0;color:var(--soft);font-size:15px">Serverless functions have no disk, so uploads are indexed by <code>/api/library</code> and stored <em>in the browser</em>, then sent back with each chat. Stateless server, no database.</p>
+        </div>
+        <div class="panel reveal">
+          <span class="eyebrow">Evaluation · 16 labelled questions</span>
+          <table style="margin-top:20px">
+            <thead><tr><th>Method</th><th>Hit@4</th><th></th><th>MRR</th></tr></thead>
+            <tbody>
+              <tr><td>BM25 only</td><td class="mono">88%</td><td><div class="bar"><i style="--w:88%"></i></div></td><td class="mono">0.73</td></tr>
+              <tr><td>Vector only</td><td class="mono">88%</td><td><div class="bar"><i style="--w:88%"></i></div></td><td class="mono">0.81</td></tr>
+              <tr class="win"><td>Hybrid RRF</td><td class="mono">94%</td><td><div class="bar"><i style="--w:94%"></i></div></td><td class="mono">0.77</td></tr>
+            </tbody>
+          </table>
+          <p style="margin:20px 0 0;color:var(--soft);font-size:15px">Each method fails on different questions, so fusing them catches more. The standalone <code>rag/</code> project adds a cross-encoder reranker: <span class="mono" style="color:var(--mint)">100% Hit@4 · MRR 1.00</span> on 18 questions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= Tools ================= -->
+  <section class="chapter" id="tools">
+    <div class="wrap">
+      <div class="side right reveal">
+        <span class="eyebrow">04 · Tool calling</span>
+        <h2>The model asks.<br><span class="grad">The code decides.</span></h2>
+        <p class="lead">Tools are described to the model as JSON Schema. It returns a structured request; the server validates it, runs it, and feeds the result back, in a loop, until the agent can answer.</p>
+      </div>
+      <div class="grid-3">
+        <div class="card reveal"><span class="k">Live data</span><h3>Market tools</h3><p><code>analyze_stock</code> returns quote, 1-year technicals (SMA, RSI, volatility, drawdown), 3 years of financials and news in one compact call, so a full analysis fits the token budget.</p></div>
+        <div class="card reveal"><span class="k">Exact maths</span><h3>A calculator you can't exploit</h3><p>No <code>eval()</code>. Expressions are parsed with Python's <code>ast</code> and only numbers, operators and whitelisted functions run. <code>__import__("os")</code> is rejected.</p></div>
+        <div class="card reveal"><span class="k">Documents</span><h3>search_documents</h3><p>Hybrid search over the 60-chunk knowledge library and the user's uploads, with stable <code>D#</code> refs shared across every agent in the run.</p></div>
+      </div>
+      <div class="panel reveal" style="margin-top:16px">
+        <pre><span class="c"># the agent loop (simplified from agents.run_specialist)</span>
+<span class="k">for</span> round <span class="k">in</span> range(max_rounds):
+    reply = groq.create(model, messages, tools=TOOLS, max_tokens=MAX_TOKENS[agent])
+    <span class="k">if not</span> reply.tool_calls: <span class="k">return</span> reply.content        <span class="c"># done: write notes</span>
+    messages.append(reply <span class="s">+ reasoning</span>)                    <span class="c"># gpt-oss needs its reasoning back</span>
+    results = parallel(run_tool(c) <span class="k">for</span> c <span class="k">in</span> reply.tool_calls)
+    messages += results</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= STATE 3: the neural brain (lessons) ================= -->
+  <section class="chapter tall" id="lessons">
+    <div class="wrap">
+      <div class="side reveal">
+        <span class="eyebrow">05 · Engineering lessons</span>
+        <h2>Bugs that taught <span class="grad">the most.</span></h2>
+        <p class="lead">Every one of these was found by testing, diagnosed from the provider's real error messages, and fixed in code rather than with prompt wishes.</p>
+      </div>
+      <div class="lessons">
+        <div class="lesson reveal"><span class="tag">empty replies</span><h3>The model forgot its own reasoning</h3><p>gpt-oss reasons before calling tools. Dropping that reasoning when sending tool results back made it end turns with no text. Fix: pass the reasoning back with the tool calls.</p></div>
+        <div class="lesson reveal"><span class="tag">instant 429s</span><h3>Rate-limited with zero usage</h3><p>Groq reserves <code>max_tokens</code> against the per-minute budget up front, and one model's default exceeded 8,000 alone. Fix: explicit per-agent <code>max_tokens</code>.</p></div>
+        <div class="lesson reveal"><span class="tag">lost data</span><h3>A crashed agent threw away its work</h3><p>A model called a tool after being told not to; Groq rejected the call and all fetched bank data vanished. Fix: a notes fallback so gathered data is never lost.</p><div class="delta">72 s, failed → 19 s, complete</div></div>
+        <div class="lesson reveal"><span class="tag">over-eager agent</span><h3>Searching for what isn't there</h3><p>The Researcher searched the library 7 times for company news it doesn't hold. Fix: tell it what the library contains, and cap search rounds in code.</p><div class="delta">37 s → 9.3 s</div></div>
+        <div class="lesson reveal"><span class="tag">json mode</span><h3>Reasoning ate the reply</h3><p>The Reviewer's hidden reasoning used its whole token allowance before writing JSON. Fix: low reasoning effort for JSON agents, and a reviewer failure now skips the review instead of crashing.</p></div>
+        <div class="lesson reveal"><span class="tag">formatting</span><h3>Never trust a model's brackets</h3><p>Citations arrived as <code>【D1】</code> and with zero-width spaces inside. Fix: normalise the stream in code; validate, don't assume.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= Security ================= -->
+  <section class="chapter" id="security">
+    <div class="wrap">
+      <div class="side right reveal">
+        <span class="eyebrow">06 · Safety & security</span>
+        <h2>Public, <span class="grad">but protected.</span></h2>
+        <p class="lead">A security review shaped the backend before any agent was added.</p>
+      </div>
+      <div class="grid-3">
+        <div class="card reveal"><span class="k">Abuse</span><h3>Rate limits & lockout</h3><p>20 messages and 10 uploads per minute per IP; 5 wrong access codes lock an IP out for 15 minutes. Codes compared with <code>secrets.compare_digest</code>.</p></div>
+        <div class="card reveal"><span class="k">Injection</span><h3>Nothing renders raw</h3><p>Every model reply is HTML-escaped before Markdown is applied; links are limited to http(s). Visitors can't send <code>system</code> messages.</p></div>
+        <div class="card reveal"><span class="k">Inputs</span><h3>Validated at the edge</h3><p>4 MB uploads, zip-bomb checks on Word files, ticker regexes, Pydantic size limits on library payloads, keys kept out of git and the browser.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= Journey ================= -->
+  <section class="chapter" id="journey">
+    <div class="wrap">
+      <div class="side reveal">
+        <span class="eyebrow">07 · How it was built</span>
+        <h2>From one API call <span class="grad">to an agent team.</span></h2>
+      </div>
+      <div class="panel" style="margin-top:56px">
+      <ol class="timeline" style="margin:0">
+        <li class="reveal"><span class="when">step 1</span><h3>A terminal chatbot</h3><p>First Groq call, a system prompt, conversation memory and token streaming in <code>chatbot.py</code>.</p></li>
+        <li class="reveal"><span class="when">step 2</span><h3>A web app on Vercel</h3><p>FastAPI backend, a hand-written streaming UI, Markdown rendering, light and dark themes, PDF and Word uploads.</p></li>
+        <li class="reveal"><span class="when">step 3</span><h3>Security hardening</h3><p>Access code, per-IP rate limiting, timing-safe comparisons and input limits, from a full security review.</p></li>
+        <li class="reveal"><span class="when">step 4</span><h3>Tool calling</h3><p>Live market-data tools with a streaming tool loop, plus the reasoning and token-budget fixes that made it reliable.</p></li>
+        <li class="reveal"><span class="when">step 5</span><h3>RAG: Ask My Docs</h3><p>A standalone RAG pipeline with BM25, embeddings, RRF, a reranker and an evaluation harness.</p></li>
+        <li class="reveal"><span class="when">step 6</span><h3>The agent team</h3><p>Planner, Analyst, Researcher, Writer and Reviewer on three models; RAG over a knowledge library and user uploads; a safe calculator.</p></li>
+        <li class="reveal" style="padding-bottom:0"><span class="when">step 7</span><h3>Design pass</h3><p>An interface audit that removed glows and looping motion, and added a numbered work log and source tags.</p></li>
+      </ol>
+      </div>
+      <div class="chips reveal" aria-label="Tech stack">
+        <span class="chip">Python</span><span class="chip">FastAPI</span><span class="chip">Groq</span><span class="chip">gpt-oss-120b / 20b</span><span class="chip">qwen3.8-27b</span><span class="chip">fastembed · BGE-small</span><span class="chip">BM25 + RRF</span><span class="chip">yfinance</span><span class="chip">Pydantic</span><span class="chip">Vanilla JS</span><span class="chip">Vercel</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span class="eyebrow">Try it</span>
+  <h2>Ask Nova <span class="grad">anything.</span></h2>
+  <p class="lead" style="margin:0 auto">Then open the work log and watch the team think.</p>
+  <div class="actions">
+    <a class="btn primary" href="/">Open Nova
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    <a class="btn ghost" href="https://github.com/vishnuteja778/nova-chatbot/tree/main/docs/guides" target="_blank" rel="noopener">Read the learning guides</a>
+  </div>
+  <p class="credit">Built by Vishnu Teja · <a href="https://github.com/vishnuteja778" target="_blank" rel="noopener">github.com/vishnuteja778</a><br>Research only, not financial advice.</p>
+</footer>
+
+<div class="state" aria-hidden="true"><i></i><span>state</span><b id="state-name">breathing</b></div>
+
+<script type="module">
+import * as THREE from "three";
+
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const small = innerWidth < 760;
+const COUNT = small ? 4500 : 8000;
+
+/* ---------- Scene ---------- */
+const canvas = document.getElementById("mind");
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 100);
+camera.position.z = 6;
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+
+const mint = new THREE.Color(0x2dd4bf);
+const violet = new THREE.Color(0xa855f7);
+
+/* ---------- Three shapes the same particles move between ---------- */
+const sphere = new Float32Array(COUNT * 3);   // state 1: breathing orb
+const galaxy = new Float32Array(COUNT * 3);   // state 2: spiral galaxy
+const brain = new Float32Array(COUNT * 3);    // state 3: neural brain
+const colors = new Float32Array(COUNT * 3);
+const seeds = new Float32Array(COUNT);
+
+const ARMS = 3;
+for (let i = 0; i < COUNT; i++) {
+  const i3 = i * 3;
+  seeds[i] = Math.random();
+
+  // Orb: a thick shell
+  const th = Math.random() * Math.PI * 2;
+  const ph = Math.acos(Math.random() * 2 - 1);
+  const r = 1.6 + (Math.random() - 0.5) * 0.4;
+  sphere[i3] = r * Math.sin(ph) * Math.cos(th);
+  sphere[i3 + 1] = r * Math.sin(ph) * Math.sin(th);
+  sphere[i3 + 2] = r * Math.cos(ph);
+
+  // Galaxy: logarithmic arms with a dense core
+  const gr = Math.pow(Math.random(), 0.65) * 3.4;
+  const arm = (i % ARMS) / ARMS * Math.PI * 2;
+  const spin = gr * 1.55;
+  const spread = (1 - gr / 3.4) * 0.15 + 0.28 * Math.pow(Math.random(), 2.4);
+  const a = arm + spin + (Math.random() - 0.5) * spread * 3;
+  galaxy[i3] = Math.cos(a) * gr + (Math.random() - 0.5) * spread;
+  galaxy[i3 + 1] = (Math.random() - 0.5) * 0.22 * (1.2 - gr / 3.4);
+  galaxy[i3 + 2] = Math.sin(a) * gr + (Math.random() - 0.5) * spread;
+
+  // Brain: two folded hemispheres, slightly apart, plus a brainstem
+  if (i < COUNT * 0.04) {
+    const t = Math.random();
+    brain[i3] = (Math.random() - 0.5) * 0.28;
+    brain[i3 + 1] = -0.7 - t * 0.9;
+    brain[i3 + 2] = -0.35 + (Math.random() - 0.5) * 0.28 - t * 0.2;
+  } else {
+    const side = Math.random() < 0.5 ? -1 : 1;
+    const bt = Math.random() * Math.PI * 2;
+    const bp = Math.acos(Math.random() * 2 - 1);
+    const fold = 1 + 0.09 * Math.sin(bt * 9) * Math.sin(bp * 7) + 0.05 * Math.sin(bp * 13 + bt * 3);
+    const shell = (0.86 + Math.random() * 0.14) * fold;
+    let x = 0.85 * Math.sin(bp) * Math.cos(bt) * shell;
+    const y = 0.95 * Math.cos(bp) * shell;
+    const z = 1.35 * Math.sin(bp) * Math.sin(bt) * shell;
+    x = Math.abs(x) * side + side * 0.08;            // the gap between hemispheres
+    brain[i3] = x * 1.25;
+    brain[i3 + 1] = y * 1.1 + (y < -0.3 ? 0.15 : 0); // flatter underside
+    brain[i3 + 2] = z;
+  }
+
+  const c = mint.clone().lerp(violet, Math.random());
+  colors[i3] = c.r; colors[i3 + 1] = c.g; colors[i3 + 2] = c.b;
+}
+
+const geo = new THREE.BufferGeometry();
+geo.setAttribute("position", new THREE.BufferAttribute(sphere, 3)); // bounding volume only
+geo.setAttribute("aSphere", new THREE.BufferAttribute(sphere, 3));
+geo.setAttribute("aGalaxy", new THREE.BufferAttribute(galaxy, 3));
+geo.setAttribute("aBrain", new THREE.BufferAttribute(brain, 3));
+geo.setAttribute("aColor", new THREE.BufferAttribute(colors, 3));
+geo.setAttribute("aSeed", new THREE.BufferAttribute(seeds, 1));
+
+/* The GPU blends the three shapes, so morphing 8,000 points costs nothing on the CPU. */
+const mat = new THREE.ShaderMaterial({
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  uniforms: {
+    uTime: { value: 0 }, uToGalaxy: { value: 0 }, uToBrain: { value: 0 },
+    uSize: { value: small ? 52 : 48 }, uPixel: { value: renderer.getPixelRatio() },
+  },
+  vertexShader: /* glsl */`
+    attribute vec3 aSphere; attribute vec3 aGalaxy; attribute vec3 aBrain;
+    attribute vec3 aColor; attribute float aSeed;
+    uniform float uTime, uToGalaxy, uToBrain, uSize, uPixel;
+    varying vec3 vColor; varying float vAlpha;
+    void main() {
+      // Lung-like breathing: a slow fundamental plus a softer harmonic
+      float breath = sin(uTime * 1.8) * 0.09 + sin(uTime * 3.6 + 1.1) * 0.03;
+      vec3 orb = aSphere * (1.0 + breath * (1.0 - uToGalaxy))
+               + normalize(aSphere) * sin(uTime * 2.0 + aSeed * 40.0) * 0.03;
+      vec3 p = mix(orb, aGalaxy, uToGalaxy);
+      p = mix(p, aBrain, uToBrain);
+      // Gentle per-particle drift so nothing is ever perfectly still
+      p += vec3(sin(uTime * .7 + aSeed * 31.0), cos(uTime * .6 + aSeed * 17.0), sin(uTime * .5 + aSeed * 23.0)) * 0.012;
+
+      vec4 mv = modelViewMatrix * vec4(p, 1.0);
+      gl_Position = projectionMatrix * mv;
+      float twinkle = 0.75 + 0.25 * sin(uTime * 2.4 + aSeed * 60.0);
+      gl_PointSize = uSize * uPixel * (0.55 + aSeed * 0.6) / -mv.z;
+      vColor = aColor * twinkle;
+      vAlpha = 0.85;
+    }`,
+  fragmentShader: /* glsl */`
+    varying vec3 vColor; varying float vAlpha;
+    void main() {
+      float d = length(gl_PointCoord - 0.5);
+      // Bright core with a soft halo, so overlapping points bloom together
+      float core = smoothstep(0.18, 0.0, d);
+      float halo = smoothstep(0.5, 0.0, d);
+      gl_FragColor = vec4(vColor * (1.0 + core * 0.8), (halo * halo * 0.7 + core * 0.6) * vAlpha);
+    }`,
+});
+const cloud = new THREE.Points(geo, mat);
+scene.add(cloud);
+
+/* ---------- Synapses: axons between nearby brain points, with firing pulses ---------- */
+const edges = [];
+const MAX_EDGES = small ? 260 : 520;
+for (let tries = 0; edges.length < MAX_EDGES && tries < 60000; tries++) {
+  const a = Math.floor(Math.random() * COUNT), b = Math.floor(Math.random() * COUNT);
+  const dx = brain[a * 3] - brain[b * 3], dy = brain[a * 3 + 1] - brain[b * 3 + 1], dz = brain[a * 3 + 2] - brain[b * 3 + 2];
+  const d = Math.hypot(dx, dy, dz);
+  if (d > 0.18 && d < 0.55) edges.push([a, b]);
+}
+const linePos = new Float32Array(edges.length * 6);
+edges.forEach(([a, b], k) => {
+  linePos.set(brain.subarray(a * 3, a * 3 + 3), k * 6);
+  linePos.set(brain.subarray(b * 3, b * 3 + 3), k * 6 + 3);
+});
+const lineGeo = new THREE.BufferGeometry();
+lineGeo.setAttribute("position", new THREE.BufferAttribute(linePos, 3));
+const lineMat = new THREE.LineBasicMaterial({ color: 0x7fa8f0, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+const axons = new THREE.LineSegments(lineGeo, lineMat);
+scene.add(axons);
+
+const PULSES = small ? 50 : 110;
+const pulsePos = new Float32Array(PULSES * 3);
+const pulses = Array.from({ length: PULSES }, () => ({ e: Math.floor(Math.random() * edges.length), t: Math.random(), v: 0.5 + Math.random() * 1.3 }));
+const pulseGeo = new THREE.BufferGeometry();
+pulseGeo.setAttribute("position", new THREE.BufferAttribute(pulsePos, 3));
+const pulseMat = new THREE.PointsMaterial({
+  size: 0.09, color: 0xeafffb, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false,
+  map: (() => {   // a soft round sprite so pulses glow instead of being squares
+    const c = document.createElement("canvas"); c.width = c.height = 64;
+    const g = c.getContext("2d"); const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(.3, "rgba(150,255,240,.6)"); gr.addColorStop(1, "rgba(0,0,0,0)");
+    g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c);
+  })(),
+});
+const synapses = new THREE.Points(pulseGeo, pulseMat);
+scene.add(synapses);
+
+/* ---------- Scroll drives the state ---------- */
+const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+let progress = 0, toGalaxy = 0, toBrain = 0;
+const stateName = document.getElementById("state-name");
+
+function readScroll(y) {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  progress = max > 0 ? y / max : 0;
+}
+let lenis = null;
+if (!reduceMotion && window.Lenis) {
+  lenis = new Lenis({ lerp: 0.085, smoothWheel: true });
+  lenis.on("scroll", e => readScroll(e.scroll));
+} else {
+  addEventListener("scroll", () => readScroll(scrollY), { passive: true });
+}
+// In-page links go through Lenis too, so they glide instead of jump
+document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener("click", e => {
+  const target = document.querySelector(a.getAttribute("href"));
+  if (!target) return;
+  e.preventDefault();
+  lenis ? lenis.scrollTo(target, { offset: -40 }) : target.scrollIntoView({ behavior: "smooth" });
+}));
+
+let mx = 0, my = 0;
+addEventListener("pointermove", e => { mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5; }, { passive: true });
+
+addEventListener("resize", () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+/* ---------- Loop ---------- */
+const clock = new THREE.Clock();
+let lastState = "";
+function frame(now) {
+  lenis?.raf(now);
+  const t = reduceMotion ? 1.5 : clock.getElapsedTime();
+
+  // State 1 → 2 around 40% scroll, 2 → 3 around 80%
+  const g = smooth(0.24, 0.42, progress), b = smooth(0.62, 0.8, progress);
+  toGalaxy += (g - toGalaxy) * 0.06;
+  toBrain += (b - toBrain) * 0.06;
+  mat.uniforms.uTime.value = t;
+  mat.uniforms.uToGalaxy.value = toGalaxy;
+  mat.uniforms.uToBrain.value = toBrain;
+
+  // Orb spins, galaxy tilts and turns, brain faces the viewer with a slow sway
+  const galaxyTilt = 1.05 * toGalaxy * (1 - toBrain);
+  cloud.rotation.x = Math.sin(t * 0.1) * 0.1 * (1 - toGalaxy) + galaxyTilt + my * 0.15;
+  cloud.rotation.y = t * (0.15 - 0.07 * toBrain) * (1 - toBrain) + toBrain * (Math.sin(t * 0.25) * 0.5 - 0.4) + mx * 0.3;
+  cloud.rotation.z = toGalaxy * (1 - toBrain) * 0.3;
+  axons.rotation.copy(cloud.rotation);
+  synapses.rotation.copy(cloud.rotation);
+  camera.position.z = 6 + toGalaxy * (1 - toBrain) * 1.6 - toBrain * 0.6;
+
+  // Synaptic firing along the axons, only in the brain state
+  lineMat.opacity = 0.14 * toBrain;
+  pulseMat.opacity = 0.95 * toBrain;
+  if (toBrain > 0.01) {
+    const dt = reduceMotion ? 0 : 0.016;
+    for (let k = 0; k < PULSES; k++) {
+      const p = pulses[k];
+      p.t += dt * p.v;
+      if (p.t >= 1) { p.t = 0; p.e = Math.floor(Math.random() * edges.length); p.v = 0.5 + Math.random() * 1.3; }
+      const [a, bb] = edges[p.e];
+      for (let j = 0; j < 3; j++) pulsePos[k * 3 + j] = brain[a * 3 + j] + (brain[bb * 3 + j] - brain[a * 3 + j]) * p.t;
+    }
+    pulseGeo.attributes.position.needsUpdate = true;
+  }
+
+  const name = toBrain > 0.5 ? "neural mind" : toGalaxy > 0.5 ? "galaxy" : "breathing";
+  if (name !== lastState) { stateName.textContent = name; lastState = name; }
+
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ---------- Reveal content as it enters ---------- */
+const io = new IntersectionObserver(entries => entries.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+}), { threshold: 0.15 });
+document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+</script>
+</body>
+</html>

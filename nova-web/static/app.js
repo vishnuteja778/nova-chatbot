@@ -23,7 +23,6 @@ const attachmentsEl = $("attachments");
 const dropzone = $("dropzone");
 const toastEl = $("toast");
 const themeBtn = $("theme-toggle");
-const backdrop = $("backdrop");
 
 const STORE_KEY = "nova-history-v2";
 const CODE_KEY = "nova-access-code";
@@ -46,6 +45,7 @@ const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
 
 const MARK = '<svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><circle class="m-ring" cx="12" cy="12" r="8.5"/><circle class="m-core" cx="12" cy="12" r="2.8"/><g class="m-sat"><circle cx="20.5" cy="12" r="1.7"/></g></svg>';
 const ICON_X = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+const ICON_CHEVRON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
 const ICON_COPY = '<svg class="i-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>';
 const ICON_CHECK = '<svg class="i-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
@@ -112,7 +112,9 @@ function inline(raw) {
   s = s
     .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
     .replace(/(^|[^*\w])\*([^*\s][^*\n]*)\*(?![*\w])/g, "$1<em>$2</em>")
-    .replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    .replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+    // Citations become source tags: [D3] -> D3, [Live data] -> Live data
+    .replace(/\[(D\d{1,3}|Live data)\]/g, '<span class="ref">$1</span>');
   return s
     .replace(/\u0001(\d+)\u0001/g, (_, i) => `<code>${codes[i] ?? ""}</code>`)
     .replace(/\n/g, "<br>");
@@ -389,17 +391,49 @@ function addBot(text = "") {
   return {
     el, body,
     thinking() { body.innerHTML = '<span class="thinking">Thinking…</span>'; },
-    // A status chip for each tool Nova runs ("Getting quote TCS.NS").
+    // Work log: one numbered step per agent action ("Analyst → calculating 12000 * 12").
     tool(label) {
       const tools = el.querySelector(".tools");
-      tools.querySelectorAll(".tool-chip.running").forEach(c => c.classList.remove("running"));
-      const chip = document.createElement("span");
-      chip.className = "tool-chip running";
-      chip.textContent = label;              // textContent: never parsed as HTML
-      tools.appendChild(chip);
+      let log = tools.querySelector(".log");
+      if (!log) {
+        tools.innerHTML = `<button type="button" class="log-toggle" aria-expanded="false">${ICON_CHEVRON}<span></span></button><ol class="log"></ol>`;
+        log = tools.querySelector(".log");
+        tools.querySelector(".log-toggle").addEventListener("click", () => {
+          const open = tools.classList.toggle("open");
+          tools.querySelector(".log-toggle").setAttribute("aria-expanded", String(open));
+        });
+      }
+      log.querySelectorAll(".step.running").forEach(s => s.classList.remove("running"));
+      const m = label.match(/^(Planner|Analyst|Researcher|Writer|Reviewer)\s*(?:→|:)\s*(.*)$/);
+      const step = document.createElement("li");
+      step.className = "step running";
+      const num = document.createElement("span");
+      num.className = "ref";
+      num.textContent = String(log.children.length + 1);
+      step.append(num);
+      if (m) {
+        const agent = document.createElement("span");
+        agent.className = "agent";
+        agent.textContent = m[1];
+        step.append(agent);
+      }
+      const detail = document.createElement("span");
+      detail.className = "detail";
+      detail.textContent = m ? m[2] : label;  // textContent: never parsed as HTML
+      detail.title = label;
+      step.append(detail);
+      log.append(step);
       if (pinned) scrollDown();
     },
-    toolsDone() { el.querySelectorAll(".tool-chip.running").forEach(c => c.classList.remove("running")); },
+    toolsDone() { el.querySelectorAll(".step.running").forEach(s => s.classList.remove("running")); },
+    // When the answer is finished, fold the log into one line ("6 steps").
+    finishLog() {
+      const tools = el.querySelector(".tools");
+      const n = tools.querySelectorAll(".step").length;
+      if (!n) return;
+      tools.querySelector(".log-toggle span").textContent = `${n} step${n > 1 ? "s" : ""}`;
+      tools.classList.add("done");
+    },
     set(text) { raw = text; body.innerHTML = render(text); },
     fail(message) { el.classList.add("error"); body.textContent = message; },
   };
@@ -634,6 +668,7 @@ async function send(text) {
   await stream.finished;                  // wait until everything received is on screen
   const reply = stream.text();
   bot.el.classList.remove("streaming");
+  bot.finishLog();
 
   if (thisChat !== chatId) {
     // "New chat" was pressed while Nova was replying: this answer belongs to the old chat.
@@ -642,7 +677,7 @@ async function send(text) {
     save(STORE_KEY, convo);
   } else {
     convo.pop();                          // the question was never answered, like messages.pop()
-    bot.fail(failure || (stream.stopped ? "Stopped." : "Nova returned an empty reply. Try again."));
+    bot.fail(failure || (stream.stopped ? "Stopped" : "Nova returned an empty reply. Try again."));
   }
 
   controller = null;
@@ -765,9 +800,6 @@ form.addEventListener("submit", e => {
   if (!text && !attachments.some(a => a.status === "ready")) return;
   input.value = "";
   autoGrow();
-  sendBtn.classList.remove("fired");
-  void sendBtn.offsetWidth;                          // restart the pulse animation
-  sendBtn.classList.add("fired");
   send(text);
 });
 
@@ -854,19 +886,9 @@ function paintThemeColor() {
 }
 themeBtn.addEventListener("click", () => {
   const next = root.dataset.theme === "dark" ? "light" : "dark";
-  const apply = () => { root.dataset.theme = next; save(THEME_KEY, next); paintThemeColor(); };
-  if (!document.startViewTransition || reduceMotion) { apply(); return; }
-
-  // The new theme opens in a growing circle that starts at the button.
-  const r = themeBtn.getBoundingClientRect();
-  const x = r.left + r.width / 2, y = r.top + r.height / 2;
-  const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
-  document.startViewTransition(apply).ready.then(() => {
-    root.animate(
-      { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
-      { duration: 650, easing: "cubic-bezier(.4, 0, .2, 1)", pseudoElement: "::view-transition-new(root)" },
-    );
-  }).catch(() => {});
+  root.dataset.theme = next;
+  save(THEME_KEY, next);
+  paintThemeColor();
 });
 // Follow the system theme until the visitor picks one themselves.
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
@@ -875,73 +897,6 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
   paintThemeColor();
 });
 paintThemeColor();
-
-// ---------- button and pointer effects ----------
-// Ripple: a soft circle spreads from where you press.
-document.addEventListener("pointerdown", e => {
-  const el = e.target.closest?.("[data-ripple]");
-  if (!el || reduceMotion) return;
-  const r = el.getBoundingClientRect();
-  const size = Math.max(r.width, r.height) * 2.2;
-  const dot = document.createElement("span");
-  dot.className = "ripple";
-  dot.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - r.left - size / 2}px;top:${e.clientY - r.top - size / 2}px`;
-  el.appendChild(dot);
-  dot.addEventListener("animationend", () => dot.remove());
-});
-
-if (finePointer && !reduceMotion) {
-  // Magnetic buttons lean toward the cursor.
-  document.querySelectorAll("[data-magnetic]").forEach(el => {
-    let mx = 0, my = 0;
-    el.addEventListener("pointermove", e => {
-      if (el.disabled) return;
-      const r = el.getBoundingClientRect();
-      mx = (e.clientX - (r.left - mx + r.width / 2)) * 0.28;
-      my = (e.clientY - (r.top - my + r.height / 2)) * 0.28;
-      el.style.setProperty("--mx", `${mx.toFixed(1)}px`);
-      el.style.setProperty("--my", `${my.toFixed(1)}px`);
-    });
-    el.addEventListener("pointerleave", () => {
-      mx = my = 0;
-      el.style.setProperty("--mx", "0px");
-      el.style.setProperty("--my", "0px");
-    });
-  });
-
-  // Suggestion cards tilt toward the cursor, with a light under it.
-  document.querySelectorAll(".suggestion").forEach(card => {
-    card.addEventListener("pointermove", e => {
-      const r = card.getBoundingClientRect();
-      const x = e.clientX - r.left, y = e.clientY - r.top;
-      card.classList.add("tilting");
-      card.style.setProperty("--x", `${x.toFixed(0)}px`);
-      card.style.setProperty("--y", `${y.toFixed(0)}px`);
-      card.style.setProperty("--ry", `${((x / r.width - 0.5) * 9).toFixed(2)}deg`);
-      card.style.setProperty("--rx", `${((0.5 - y / r.height) * 9).toFixed(2)}deg`);
-    });
-    card.addEventListener("pointerleave", () => {
-      card.classList.remove("tilting");
-      card.style.setProperty("--rx", "0deg");
-      card.style.setProperty("--ry", "0deg");
-    });
-  });
-
-  // A soft light in the background follows the cursor, easing toward it.
-  let tx = innerWidth / 2, ty = -120, px = tx, py = ty, moving = false;
-  const glide = () => {
-    px += (tx - px) * 0.1;
-    py += (ty - py) * 0.1;
-    backdrop.style.setProperty("--px", `${px.toFixed(1)}px`);
-    backdrop.style.setProperty("--py", `${py.toFixed(1)}px`);
-    if (Math.abs(tx - px) + Math.abs(ty - py) > 0.5) requestAnimationFrame(glide);
-    else moving = false;
-  };
-  window.addEventListener("pointermove", e => {
-    tx = e.clientX; ty = e.clientY;
-    if (!moving) { moving = true; requestAnimationFrame(glide); }
-  }, { passive: true });
-}
 
 // ---------- start-up ----------
 if (convo.length) {
