@@ -4,6 +4,8 @@
 
 Built by Vishnu Teja while learning AI engineering, from a first API call to a five-agent system.
 
+**Live demo:** [nova-web-gold.vercel.app](https://nova-web-gold.vercel.app) · **Portfolio page:** [nova-web-gold.vercel.app/about](https://nova-web-gold.vercel.app/about/)
+
 ![Nova's chat: a breathing particle orb above the headline "Answers that show their sources"](docs/welcome.png)
 
 | | |
